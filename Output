@@ -1,16 +1,80 @@
-  01:53:52.562  BodyData.new started  -  Server - BodyData:9
-  01:53:52.563  BodyData.New finished  -  Server - BodyData:134
-  01:53:52.643  BodyData.new started  -  Server - BodyData:9
-  01:53:52.643  BodyData.New finished  -  Server - BodyData:134
-  01:53:52.643  [BodyService] Body created for Shhhheptun  -  Server - BodyService:47
-  01:53:52.643  [BodyService] BodyState created for Shhhheptun  -  Server - BodyService:27
-  01:53:52.644   ▶ {...}  -  Server - BodyService:96
-  01:53:52.646  nil  -  Server - BodyService:97
-  01:53:52.646  ServerScriptService.BodySystem.BodyService:210: attempt to compare nil <= number  -  Server - BodyService:210
-  01:53:52.646  Stack Begin  -  Studio
-  01:53:52.646  Script 'ServerScriptService.BodySystem.BodyService', Line 210 - function UpdateGlobalStates  -  Studio - BodyService:210
-  01:53:52.646  Script 'ServerScriptService.BodySystem.BodyService', Line 105 - function UpdateBody  -  Studio - BodyService:105
-  01:53:52.646  Script 'ServerScriptService.BodySystem.BodyService', Line 244  -  Studio - BodyService:244
-  01:53:52.646  Stack End  -  Studio
-  01:53:52.657   ▶ {...}  -  Server - BodyService:96
-  01:53:52.659  nil  -  Server - BodyService:97
+  01:59:14.884  >>> ACTIVE MOODS UPDATE (EVALUATED)  -  Server - DebugMoodLogger:4
+  01:59:14.884  BODY IS:  ▼  {
+                    ["ActiveMoods"] =  ▶ {...},
+                    ["Adrenaline"] = 0,
+                    ["AllBleeds"] = 0,
+                    ["Blood"] = 5000,
+                    ["Brain"] = 100,
+                    ["Consciousness"] = 100,
+                    ["Energy"] = 100,
+                    ["HeartRate"] = 80,
+                    ["Hunger"] = 121,
+                    ["Immunity"] = 100,
+                    ["MaxAdrenaline"] = 100,
+                    ["MaxAllBleeds"] = 2200,
+                    ["MaxBlood"] = 7500,
+                    ["MaxHunger"] = 125,
+                    ["MaxImmunity"] = 200,
+                    ["MaxPain"] = 100,
+                    ["MaxThirst"] = 200,
+                    ["MinBrain"] = 0,
+                    ["MinEnergy"] = 0,
+                    ["MinHunger"] = -50,
+                    ["MinImmunity"] = 0,
+                    ["MinOxygen"] = 0,
+                    ["MinStamina"] = 0,
+                    ["MinThirst"] = -25,
+                    ["Moods"] =  ▶ {...},
+                    ["Oxygen"] = 100,
+                    ["OxygenBlocked"] = false,
+                    ["Pain"] = 0,
+                    ["Parts"] =  ▶ {...},
+                    ["Stamina"] = 100,
+                    ["States"] =  ▶ {...},
+                    ["Temperature"] = 36.6,
+                    ["Thirst"] = 40
+                 }  -  Server - DebugMoodLogger:10
+  01:59:14.886  ╔══════════ ACTIVE MOODS ══════════╗  -  Server - DebugMoodLogger:10
+  01:59:14.887  ║ Full | Hunger | Переел  -  Server - DebugMoodLogger:10
+  01:59:14.887  ║ Dehydrated | Thirst | Обезвожен  -  Server - DebugMoodLogger:10
+  01:59:14.887  ╚══════════════════════════════════╝  -  Server - DebugMoodLogger:10
+  01:59:14.887   ▼  {
+                    ["Adrenaline"] = 0,
+                    ["AllBleeds"] = 0,
+                    ["Blood"] = 5000,
+                    ["Brain"] = 100,
+                    ["Consciousness"] = 100,
+                    ["Energy"] = 100,
+                    ["HeartRate"] = 80,
+                    ["Hunger"] = 100,
+                    ["Immunity"] = 200,
+                    ["MaxAdrenaline"] = 100,
+                    ["MaxAllBleeds"] = 2200,
+                    ["MaxBlood"] = 7500,
+                    ["MaxHunger"] = 125,
+                    ["MaxImmunity"] = 200,
+                    ["MaxPain"] = 100,
+                    ["MaxThirst"] = 200,
+                    ["MinBrain"] = 0,
+                    ["MinEnergy"] = 0,
+                    ["MinHunger"] = -50,
+                    ["MinImmunity"] = 0,
+                    ["MinOxygen"] = 0,
+                    ["MinStamina"] = 0,
+                    ["MinThirst"] = -25,
+                    ["Oxygen"] = 100,
+                    ["OxygenBlocked"] = false,
+                    ["Pain"] = 0,
+                    ["Parts"] =  ▶ {...},
+                    ["Stamina"] = 100,
+                    ["States"] =  ▶ {...},
+                    ["Temperature"] = 36.6,
+                    ["Thirst"] = 100
+                 }  -  Server - BodyService:96
+  01:59:14.889  nil  -  Server - BodyService:97
+  01:59:14.889  Tick 200  -  Server - BodyService:106
+  01:59:14.894   ▶ {...}  -  Server - BodyService:96
+  01:59:14.896  nil  -  Server - BodyService:97
+  01:59:14.896  Tick 200  -  Server - BodyService:106
+  01:59:14.911   ▶ {...}  -  Server - BodyService:96
+  01:59:14.913  nil  -  Server - BodyService:97
