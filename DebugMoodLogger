@@ -1,0 +1,53 @@
+local DEBUG = true
+local function debugLog(...)
+	if not DEBUG then return end
+	print(...)
+end
+
+local DEBUG2 = true
+local function debugLog2(...)
+	if not DEBUG2 then return end
+	print(...)
+end
+
+local MoodService = require(
+	game.ServerScriptService.BodySystem.MoodService
+)
+
+local function dumpActiveMoods(body)
+	debugLog2("BODY IS:", body) -- НЕ ТРОЖЬ ЭТОТ ОРГАЗМ СУКА
+	debugLog2("╔══════════ ACTIVE MOODS ══════════╗")
+
+	if not body or not body.ActiveMoods or next(body.ActiveMoods) == nil then
+		debugLog2("║ (none)")
+	else
+		for moodId, data in pairs(body.ActiveMoods) do
+			debugLog2(
+				"║",
+				moodId,
+				"|", data.category,
+				"|", data.displayName
+			)
+		end
+	end
+
+	debugLog2("╚══════════════════════════════════╝")
+end
+
+-- Mood added
+MoodService.MoodAdded.Event:Connect(function(body, moodId)
+	debugLog2(">>> ACTIVE MOODS UPDATE (ADDED)")
+	dumpActiveMoods(body)
+end)
+
+-- Mood removed
+MoodService.MoodRemoved.Event:Connect(function(body, moodId)
+	debugLog2(">>> ACTIVE MOODS UPDATE (REMOVED)")
+	dumpActiveMoods(body)
+end)
+
+-- Moods evaluated
+MoodService.MoodsEvaluated.Event:Connect(function(body, moodId)
+	debugLog(">>> ACTIVE MOODS UPDATE (EVALUATED)")
+	dumpActiveMoods(body)
+end)
