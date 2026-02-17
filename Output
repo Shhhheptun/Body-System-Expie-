@@ -1,0 +1,16 @@
+  01:53:52.562  BodyData.new started  -  Server - BodyData:9
+  01:53:52.563  BodyData.New finished  -  Server - BodyData:134
+  01:53:52.643  BodyData.new started  -  Server - BodyData:9
+  01:53:52.643  BodyData.New finished  -  Server - BodyData:134
+  01:53:52.643  [BodyService] Body created for Shhhheptun  -  Server - BodyService:47
+  01:53:52.643  [BodyService] BodyState created for Shhhheptun  -  Server - BodyService:27
+  01:53:52.644   ▶ {...}  -  Server - BodyService:96
+  01:53:52.646  nil  -  Server - BodyService:97
+  01:53:52.646  ServerScriptService.BodySystem.BodyService:210: attempt to compare nil <= number  -  Server - BodyService:210
+  01:53:52.646  Stack Begin  -  Studio
+  01:53:52.646  Script 'ServerScriptService.BodySystem.BodyService', Line 210 - function UpdateGlobalStates  -  Studio - BodyService:210
+  01:53:52.646  Script 'ServerScriptService.BodySystem.BodyService', Line 105 - function UpdateBody  -  Studio - BodyService:105
+  01:53:52.646  Script 'ServerScriptService.BodySystem.BodyService', Line 244  -  Studio - BodyService:244
+  01:53:52.646  Stack End  -  Studio
+  01:53:52.657   ▶ {...}  -  Server - BodyService:96
+  01:53:52.659  nil  -  Server - BodyService:97
