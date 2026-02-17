@@ -1,0 +1,242 @@
+local RunService = game:GetService("RunService")
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local bodySystem = ReplicatedStorage:WaitForChild("BodySystem")
+
+--// Modules
+local Config = require(bodySystem:WaitForChild("Expie_Config"))
+local BodyData = require(bodySystem:WaitForChild("BodyData"))
+
+local Players = game:GetService("Players")
+
+-- СОЗДАЁМ BodyState, ЕСЛИ ЕГО НЕТ
+
+local bodyStateFolder = bodySystem:FindFirstChild("BodyState")
+if not bodyStateFolder then
+	bodyStateFolder = Instance.new("Folder")
+	bodyStateFolder.Name = "BodyState"
+	bodyStateFolder.Parent = bodySystem
+end
+
+Players.PlayerAdded:Connect(function(player)
+	local playerFolder = Instance.new("Folder")
+	playerFolder.Name = tostring(player.UserId)
+	playerFolder.Parent = bodyStateFolder
+
+	print("[BodyService] BodyState created for", player.Name)
+end)
+
+
+
+-- хранилище тел игроков
+local PlayerBodies = {}
+
+local BodyService = {}
+BodyService.__index = BodyService
+
+BodyService.Bodies = {}
+
+local BodyData = require(game.ReplicatedStorage.BodySystem.BodyData)
+
+function BodyService:CreateBodyForPlayer(player)
+	local body = self:CreateBody()
+	
+	self.Bodies[player] = body
+
+	print("[BodyService] Body created for", player.Name)
+
+	return body
+end
+
+
+
+function BodyService:RemoveBodyForPlayer(player)
+	self.Bodies[player] = nil
+	print("[BodyService] Body removed for", player.Name)
+end
+
+-- ==============================
+-- СОЗДАНИЕ ТЕЛА
+-- ==============================
+
+function BodyService:CreateBody()
+	local body = BodyData.new()
+	return body
+end
+
+-- ==============================
+-- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+-- ==============================
+
+local function clamp(value, min, max)
+	return math.max(min, math.min(value, max))
+end
+
+-- ==============================
+-- UPDATE BODY
+-- ==============================
+function BodyService:UpdateBody(body, dt)
+	-- Иммунитет
+	body.Immunity = 
+		self:CalculateImmunity(body)
+	
+	 print(body)
+	 print(body.Stats)
+	
+	-- Конечности
+	for _, limb in pairs(body.Parts) do 
+		self:UpdateLimbRegen(limb, dt)
+	end
+	
+	-- Глобальные состояния
+	self:UpdateGlobalStates(body, dt)
+	print("Tick", body.Immunity)
+end
+
+
+
+-- ==============================
+-- IMPACT 
+-- ==============================
+
+
+-- ==============================
+-- ИММУНИТЕТ
+-- ==============================
+
+function BodyService:CalculateImmunity(stats)
+
+	local immunity = 100
+
+	-- HUNGER
+	if stats.Hunger > 70 then
+		immunity += (stats.Hunger - 70) * 0.75
+	end
+
+	-- THIRST
+	if stats.Thirst > 60 then
+		immunity += (stats.Thirst - 60) * 0.3
+	end
+
+	-- ENERGY
+	if stats.Energy > 60 then
+		immunity += (stats.Energy - 60) * 0.2
+	end
+
+	-- TEMPERATURE
+	if stats.Temperature > 37 then
+		immunity += (stats.Temperature - 37) * 8
+	end
+
+	-- BLOOD
+	if stats.Blood > 100 then
+		immunity += (stats.Blood - 100) * 0.2
+	end
+
+	-- ANTIBIOTICS
+	if stats.HasAntibiotics then
+		immunity += 70
+	end
+
+	return math.clamp(immunity, 0, 200)
+end
+
+-- ==============================
+-- РЕГЕН КОЖИ/МЫШЦ
+-- ==============================
+
+local REGEN_CONFIG = {
+	Skin = {
+		NormalRate = 10,
+		CriticalRate = 60,
+		CriticalThreshold = 10,
+	},
+	
+	Muscle = {
+		NormalRate = 10,
+		CriticalRate = 60,
+		CriticalThreshold = 10,
+	}
+}
+
+function BodyService:UpdateLimbRegen(limb, deltaTime)
+
+	-- SKIN
+	if limb.Infection <= 0 then
+		local skin = limb.Skin
+
+		if limb.Skin < Config.Global.MAX_SKIN then
+			
+			limb.RegenTimer += deltaTime
+			
+			if limb.RegenTimer >= 1 then
+				limb.RegenTimer = 0
+				limb.Skin += 1
+			end
+		end
+	end
+
+	-- MUSCLE
+	local muscle = limb.Muscle
+
+	if limb.Muscle < Config.Global.MAX_MUSCLE then
+		limb.RegenTimer += deltaTime
+		
+		if limb.RegenTimer >= 1 then
+			limb.RegenTimer = 0
+			limb.Muscle += 1
+		end
+	end
+end
+
+-- ==============================
+-- ОБНОВЛЕНИЕ СОСТОЯНИЙ
+-- ==============================
+function BodyService.UpdateGlobalStates(body)
+	-- смерть
+	if body.Brain <= 0 then
+		body.States.Dead = true
+		body.States.Unconscious = true
+		return
+	end
+
+	-- сознание всегда стремится к мозгу
+	body.Consciousness = clamp(
+		body.Consciousness,
+		0,
+		body.Brain
+	)
+
+	-- потеря сознания
+	if body.Consciousness <= 0 then
+		body.States.Unconscious = true
+	elseif body.Consciousness >= 10 then
+		body.States.Unconscious = false        
+	end
+end
+
+
+Players.PlayerAdded:Connect(function(player)
+	BodyService:CreateBodyForPlayer(player)
+end)
+
+Players.PlayerRemoving:Connect(function(player)
+	BodyService:RemoveBodyForPlayer(player)
+end)
+
+function BodyService:Start()
+	
+	RunService.Heartbeat:Connect(function(dt)
+		for player, body in pairs(self.Bodies) do
+			self:UpdateBody(body, dt)
+		
+		end
+	end)
+end
+
+-- Старт цикла
+BodyService:Start()
+
+
+return BodyService
