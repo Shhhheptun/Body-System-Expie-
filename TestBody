@@ -1,0 +1,37 @@
+local DEBUG = false
+local function debugLog(...)
+	if not DEBUG then return end
+	print(...)
+end
+
+debugLog("TESTBODY LOADED")
+
+debugLog("Before require")
+
+local BodyService = require(game.ServerScriptService.BodySystem.BodyService)
+local MoodService = require(game.ServerScriptService.BodySystem.MoodService)
+
+debugLog("After require", BodyService)
+debugLog("CreateBody exists:", BodyService.CreateBody)
+
+local body = BodyService:CreateBody(nil)
+
+local function printMood()
+	
+end
+
+
+
+debugLog("BodyService =", BodyService)
+debugLog("MoodService =", MoodService)
+
+task.wait(1)
+body.Hunger = 121
+MoodService:Evaluate(nil, body)
+
+task.wait(1)
+body.Thirst = 40
+MoodService:Evaluate(nil, body)
+
+debugLog("BodyServise:", BodyService)
+debugLog("CreateBody:", BodyService.CreateBody)
