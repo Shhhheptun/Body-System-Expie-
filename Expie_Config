@@ -1,0 +1,78 @@
+local Config = {}
+
+-- ==============================
+-- ГЛОБАЛЬНЫЕ ПАРАМЕТРЫ ТЕЛА
+-- ==============================
+
+Config.Global = {
+
+-- ЦЕЛОСТНОСТЬ МОЗГА
+MAX_BRAIN = 100,
+BRAIN = 100,
+MIN_BRAIN = 0,
+
+-- ЦЕЛОСТНОСТЬ КОЖИ/МЫШЦ
+SKIN = 100,
+MIN_SKIN = 0,
+MAX_SKIN = 100,
+MUSCLE = 100,
+MIN_MUSCLE = 0,
+MAX_MUSCLE = 100,
+
+-- ИНФЕКЦИИ
+INFECTION = 0,
+MAX_INFECTION = 100,
+
+-- КОЛИЧЕСТВО КРОВИ
+MAX_BLOOD = 7500,
+BLOOD = 5000,
+
+-- КРОВОТЕЧЕНИЕ
+ALL_BLEEDS = 0,
+MAX_ALL_BLEEDS = 2200,
+
+-- ЛОКАЛЬНОЕ КРОВОТЕЧЕНИЕ
+LIMB_BLEED = 0,
+MAX_LIMB_BLEED = 220,
+
+-- КИСЛОРОД
+OXYGEN = 100,
+MIN_OXYGEN = 0,
+
+-- ГОЛОД
+MAX_HUNGER = 125,
+HUNGER = 100,
+MIN_HUNGER = -50,
+
+-- ЖАЖДА
+MAX_THIRST = 200,
+THIRST = 100,
+MIN_THIRST = -25,
+
+-- АДРЕНАЛИН
+ADRENALINE = 0,
+MAX_ADRENALINE = 100,
+
+-- БОЛЬ
+PAIN = 0,
+MAX_PAIN = 100,
+
+-- ЛОКАЛЬНАЯ БОЛЬ
+LIMB_PAIN = 0,
+MAX_LIMB_PAIN = 100,
+
+-- ИММУНИТЕТ
+MAX_IMMUNITY = 200,
+IMMUNITY = 100,
+MIN_IMMUNITY = 0,
+
+-- ЭНЕРГИЯ
+ENERGY = 100,
+MIN_ENERGY = 0,
+
+-- ВЫНОСЛИВОСТЬ
+STAMINA = 100,
+MIN_STAMINA = 0,
+}
+
+return Config
