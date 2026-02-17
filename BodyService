@@ -77,6 +77,18 @@ end
 -- UPDATE BODY
 -- ==============================
 function BodyService:UpdateBody(body, dt)
+	
+	if type(body) ~= "table" then
+		warn("BODY NOT TABLE", body)
+		return
+	end
+	
+	for name, limb in pairs(body.Parts) do
+		if type(limb) ~= "table" then
+			warn("LIMB BROKEN", name, limb)
+		end
+	end
+	
 	-- Иммунитет
 	body.Immunity = 
 		self:CalculateImmunity(body)
@@ -193,7 +205,7 @@ end
 -- ==============================
 -- ОБНОВЛЕНИЕ СОСТОЯНИЙ
 -- ==============================
-function BodyService.UpdateGlobalStates(body)
+function BodyService:UpdateGlobalStates(body)
 	-- смерть
 	if body.Brain <= 0 then
 		body.States.Dead = true
@@ -212,7 +224,7 @@ function BodyService.UpdateGlobalStates(body)
 	if body.Consciousness <= 0 then
 		body.States.Unconscious = true
 	elseif body.Consciousness >= 10 then
-		body.States.Unconscious = false        
+		body.States.Unconscious = false
 	end
 end
 
@@ -238,5 +250,7 @@ end
 -- Старт цикла
 BodyService:Start()
 
+
+return BodyService
 
 return BodyService
