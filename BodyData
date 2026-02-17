@@ -1,0 +1,138 @@
+local Config = require(script.Parent:WaitForChild("Expie_Config"))
+
+local BodyData = {}
+BodyData.__index = BodyData
+-- ==============================
+-- СОЗДАНИЕ ТЕЛА
+-- ==============================
+function BodyData.new()
+	print("BodyData.new started")
+	
+	local self = setmetatable({}, BodyData)
+	
+	local G = Config.Global
+
+	-- ГЛОБАЛЬНЫЕ ПОКАЗАТЕЛИ
+	self.Brain = G.MAX_BRAIN
+	self.MinBrain = G.MIN_BRAIN
+	self.Consciousness = G.MAX_BRAIN
+
+	self.Pain = G.PAIN
+	self.MaxPain = G.MAX_PAIN
+
+	self.Blood = G.BLOOD
+	self.MaxBlood = G.MAX_BLOOD
+	
+	self.AllBleeds = G.ALL_BLEEDS
+	self.MaxAllBleeds = G.MAX_ALL_BLEEDS
+	
+	self.HeartRate = 80
+	self.Adrenaline = G.ADRENALINE
+	self.MaxAdrenaline = G.MAX_ADRENALINE
+ 	
+	self.Oxygen = G.OXYGEN
+	self.MinOxygen = G.MIN_OXYGEN
+	
+	self.OxygenBlocked = false -- удушье, под водой, и т.п
+	
+	self.MaxHunger = G.MAX_HUNGER
+	self.Hunger = G.HUNGER
+	self.MinHunger = G.MIN_HUNGER
+	
+	self.MaxImmunity = G.MAX_IMMUNITY
+	self.Immunity = G.IMMUNITY
+	self.MinImmunity = G.MIN_IMMUNITY
+	
+	self.Temperature = 36.6
+	
+	self.MaxThirst = G.MAX_THIRST
+	self.Thirst = G.THIRST
+	self.MinThirst = G.MIN_THIRST
+	
+	self.Energy = G.ENERGY
+	self.MinEnergy = G.MIN_ENERGY
+	
+	self.Stamina = G.STAMINA
+	self.MinStamina = G.MIN_STAMINA
+
+	-- ОБЩЕЕ СОСТОЯНИЯ
+	self.States = {
+		Unconscious = false,
+		Dead = false,
+		InShock = false,
+	}
+
+	-- ==============================
+	-- ЧАСТИ ТЕЛА
+	-- ==============================
+	local Config = require(script.Parent:WaitForChild("Expie_Config"))
+
+	local BodyData = {}
+	BodyData.__index = BodyData
+
+	local function CreateBaseLimb(displayName)
+		return {
+			DisplayName = displayName,
+			Skin = G.SKIN,
+			Muscle = G.MUSCLE,
+			RegenTimer = 0,
+			LimbBleed = 0,
+			LimbPain = 0,
+			Infection = 0,
+			Fracture = false,
+			Dislocation = false,
+		}
+	end
+
+	local function CreateHead()
+		local head = CreateBaseLimb("Голова")
+		head.Skin = G.SKIN
+		head.Muscle = G.MUSCLE
+		head.Fracture = false
+		head.Dislocation = false
+		head.LimbBleed = 0
+		head.LimbPain = 0
+		head.Infection = 0
+		head.RegenTimer = 0
+
+		head.JawRipped = false
+		head.LeftEyeRipped = false
+		head.RightEyeRipped = false
+
+		head.Mouth = {
+			SmthinIn = false,
+		}
+
+		return head
+	end
+
+	self.Parts = {
+
+		    Head = CreateHead(), -- Голова
+
+		    Chest = CreateBaseLimb("Грудная Клетка"), -- Грудная клетка
+
+			Stomach = CreateBaseLimb("Живот"), -- Живот
+
+			LeftShoulder = CreateBaseLimb("Левое Плечо"), -- Левое плечо
+
+			LeftForearm = CreateBaseLimb("Левое Предплечье"), -- Левое предплечье
+
+			RightShoulder = CreateBaseLimb("Правое Плечо"), -- Правое плечо
+
+			RightForearm = CreateBaseLimb("Правое Предплечье"), -- Правое предплечье
+
+			LeftThigh = CreateBaseLimb("Левое Бедро"), -- Левое бедро
+
+			LeftShin = CreateBaseLimb("Левая Голень"), -- Левая голень
+
+			RightThigh = CreateBaseLimb("Правое Бедро"), -- Правое бедро
+
+			RightShin = CreateBaseLimb("Правая Голень"), -- Правая голень
+	}
+
+    print("BodyData.New finished")
+	return self
+		
+	end
+return BodyData
