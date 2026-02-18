@@ -1,5 +1,12 @@
-  01:59:14.884  >>> ACTIVE MOODS UPDATE (EVALUATED)  -  Server - DebugMoodLogger:4
-  01:59:14.884  BODY IS:  ▼  {
+  15:55:51.795  === SORTED CATEGORIES ===  -  Server - MoodService:10
+  15:55:51.795  1 BrainDamage  -  Server - MoodService:10
+  15:55:51.795  2 Adrenaline  -  Server - MoodService:10
+  15:55:51.795  3 Pain  -  Server - MoodService:10
+  15:55:51.795  4 Hunger  -  Server - MoodService:10
+  15:55:51.795  5 Thirst  -  Server - MoodService:10
+  15:55:51.795  =========================  -  Server - MoodService:10
+  15:55:51.795  HUNGER CHANGED TO 121  -  Server - TestBody:31
+  15:55:51.795  BODY REF CHANGE  ▼  {
                     ["ActiveMoods"] =  ▶ {...},
                     ["Adrenaline"] = 0,
                     ["AllBleeds"] = 0,
@@ -32,13 +39,26 @@
                     ["Stamina"] = 100,
                     ["States"] =  ▶ {...},
                     ["Temperature"] = 36.6,
-                    ["Thirst"] = 40
-                 }  -  Server - DebugMoodLogger:10
-  01:59:14.886  ╔══════════ ACTIVE MOODS ══════════╗  -  Server - DebugMoodLogger:10
-  01:59:14.887  ║ Full | Hunger | Переел  -  Server - DebugMoodLogger:10
-  01:59:14.887  ║ Dehydrated | Thirst | Обезвожен  -  Server - DebugMoodLogger:10
-  01:59:14.887  ╚══════════════════════════════════╝  -  Server - DebugMoodLogger:10
-  01:59:14.887   ▼  {
+                    ["Thirst"] = 100
+                 }  -  Server - TestBody:32
+  15:55:51.797  >>> ACTIVE MOODS UPDATE (ADDED)  -  Server - DebugMoodLogger:10
+  15:55:51.798  BODY IS:  ▶ {...}  -  Server - DebugMoodLogger:10
+  15:55:51.800  ╔══════════ ACTIVE MOODS ══════════╗  -  Server - DebugMoodLogger:10
+  15:55:51.800  ║ Full | Hunger | Переел  -  Server - DebugMoodLogger:10
+  15:55:51.800  ╚══════════════════════════════════╝  -  Server - DebugMoodLogger:10
+  15:55:51.800  >>> ACTIVE MOODS UPDATE (ADDED)  -  Server - DebugMoodLogger:10
+  15:55:51.801  BODY IS:  ▶ {...}  -  Server - DebugMoodLogger:10
+  15:55:51.803  ╔══════════ ACTIVE MOODS ══════════╗  -  Server - DebugMoodLogger:10
+  15:55:51.803  ║ Full | Hunger | Переел  -  Server - DebugMoodLogger:10
+  15:55:51.803  ║ Slaked | Thirst | Напился  -  Server - DebugMoodLogger:10
+  15:55:51.803  ╚══════════════════════════════════╝  -  Server - DebugMoodLogger:10
+  15:55:51.803  >>> ACTIVE MOODS UPDATE (EVALUATED)  -  Server - DebugMoodLogger:4
+  15:55:51.804  BODY IS:  ▶ {...}  -  Server - DebugMoodLogger:10
+  15:55:51.806  ╔══════════ ACTIVE MOODS ══════════╗  -  Server - DebugMoodLogger:10
+  15:55:51.806  ║ Full | Hunger | Переел  -  Server - DebugMoodLogger:10
+  15:55:51.806  ║ Slaked | Thirst | Напился  -  Server - DebugMoodLogger:10
+  15:55:51.806  ╚══════════════════════════════════╝  -  Server - DebugMoodLogger:10
+  15:55:51.806  Tick  ▼  {
                     ["Adrenaline"] = 0,
                     ["AllBleeds"] = 0,
                     ["Blood"] = 5000,
@@ -47,7 +67,7 @@
                     ["Energy"] = 100,
                     ["HeartRate"] = 80,
                     ["Hunger"] = 100,
-                    ["Immunity"] = 200,
+                    ["Immunity"] = 106.5192435248647,
                     ["MaxAdrenaline"] = 100,
                     ["MaxAllBleeds"] = 2200,
                     ["MaxBlood"] = 7500,
@@ -70,11 +90,14 @@
                     ["States"] =  ▶ {...},
                     ["Temperature"] = 36.6,
                     ["Thirst"] = 100
-                 }  -  Server - BodyService:96
-  01:59:14.889  nil  -  Server - BodyService:97
-  01:59:14.889  Tick 200  -  Server - BodyService:106
-  01:59:14.894   ▶ {...}  -  Server - BodyService:96
-  01:59:14.896  nil  -  Server - BodyService:97
-  01:59:14.896  Tick 200  -  Server - BodyService:106
-  01:59:14.911   ▶ {...}  -  Server - BodyService:96
-  01:59:14.913  nil  -  Server - BodyService:97
+                 } 106.51924352486472  -  Server - BodyService:115
+  15:55:51.808  Tick HUNGER: 100  -  Server - BodyService:116
+  15:55:51.808  Tick THIRST 100  -  Server - BodyService:117
+  15:55:51.808  BODY REF:  ▶ {...}  -  Server - BodyService:118
+  15:55:51.812  Tick  ▶ {...} 106.63739396979639  -  Server - BodyService:115
+  15:55:51.814  Tick HUNGER: 100  -  Server - BodyService:116
+  15:55:51.814  Tick THIRST 100  -  Server - BodyService:117
+  15:55:51.814  BODY REF:  ▶ {...}  -  Server - BodyService:118
+  15:55:51.829  Tick  ▶ {...} 106.74901476478396  -  Server - BodyService:115
+  15:55:51.832  Tick HUNGER: 100  -  Server - BodyService:116
+  15:55:51.832  Tick THIRST 100  -  Server - BodyService:117
