@@ -1,0 +1,232 @@
+local MoodDefs = {
+	
+	
+	-- =========================
+	-- ГОЛОД
+	-- =========================
+	Hunger = {
+		priority = 50,
+		states = {
+			{
+				id = "Satiated",
+				displayName = "Наелся",
+				description = '"Вы хорошо поели сегодня! Голод появляется медленней в полтара раза"', 
+				condition = function(body)
+					return body.Hunger >= 100 and body.Hunger <= 120
+				end
+			},
+			{
+				id = "Full",
+				displayName = "Переел",
+				description = '"Ты переел! В тебя больше не лезет"',
+				condition = function(body)
+					return body.Hunger >= 120 and body.Hunger <= 125
+				end
+			},
+			{
+				id = "Peckish",
+				displayName = "Проголодался",
+				description = '"Пора перекусить."',
+				condition = function(body)
+					return body.Hunger <= 75 and body.Hunger >= 50
+				end
+			},
+			{
+				id = "Hungry",
+				displayName = "Голодный",
+				description = '"Неприятный голод. Немного слабее обычного"',
+				condition = function(body)
+					return body.Hunger <= 50 and body.Hunger >= 35
+				end
+			},
+			{
+				id = "VeryHungry",
+				displayName = "Сильно голоден",
+				description = '"Чертовски голоден... Ещё немного и тело твое начнет саморазрушаться. Слабее обычного..."',
+				condition = function(body)
+					return body.Hunger <= 35 and body.Hunger >= 15
+				end
+			},
+			{
+				id = "Starving",
+				displayName = "Истощён",
+				description = '"Тело поедает само себя... Отказ органов неизбежен..."',
+				condition = function(body)
+					return body.Hunger <= 15 and body.Hunger >= -50
+				end
+			},
+		}
+	},
+	-- =========================
+	-- ЖАЖДА
+	-- =========================
+	Thirst = {
+		priority = 50,
+		states = {
+			{
+				id = "WaterIntoxicated",
+				displayName = "Водная интоксикация",
+				description = "dscWaterIntoxicated",
+				condition = function(body)
+					return body.Thirst >= 150 and body.Thirst <= 200
+				end
+			},
+			{
+				id = "Overhydrated",
+				displayName = "Перепил",
+				description = "dscOverhydrated",
+				condition = function(body)
+					return body.Thirst >= 125 and body.Thirst <= 150
+				end
+			},		
+			{
+				id = "Slaked",
+				displayName = "Напился",
+				description = "dscSlaked",
+				condition = function(body)
+					return body.Thirst >= 100 and body.Thirst <= 125
+				end
+			},		
+			{
+				id = "Thirsty",
+				displayName = "Жажда",
+				description = "dscThirsty",
+				condition = function(body)
+					return body.Thirst <= 75 and body.Thirst >= 55
+				end
+			},
+			{
+				id = "Dehydrated",
+				displayName = "Обезвожен",
+				description = "dscDehydrated",
+				condition = function(body)
+					return body.Thirst <= 55 and body.Thirst >= 35
+				end
+			},
+			{
+				id = "Parched",
+				displayName = "Пересохший",
+				description = "dscParched",
+				condition = function(body)
+					return body.Thirst <= 35 and body.Thirst >= 20
+				end
+			},
+			{
+				id = "Desiccated",
+				displayName = "Иссушенный",
+				description = "dscDesiccated",
+				condition = function(body)
+					return body.Thirst <= 20 and body.Thirst >= -25
+				end
+			},
+		}
+	},
+
+	-- =========================
+	-- БОЛЬ
+	-- =========================
+	Pain = {
+		priority = 100,
+		states = {
+			{
+				id = "MinorDiscomfort",
+				displayName = "Небольшой дискомфорт",
+				description = 'Вам немного больно. Ауч...', 
+				condition = function(body)
+					return body.Pain >= 10 and body.Pain <= 30
+				end
+			},
+			{
+				id = "Pain",
+				displayName = "Боль",
+				description = 'Весьма больно!',
+				condition = function(body)
+					return body.Pain >= 30 and body.Pain <= 55
+				end
+			},
+			{
+				id = "StrongPain",
+				displayName = "Сильная боль",
+				description = 'Находясь в полубессознательном состоянии, ваш разум затуманен болью...',
+				condition = function(body)
+					return body.Pain >= 55 and body.Pain <= 80
+				end
+			},
+			{
+				id = "Agony",
+				displayName = "Агония", 
+				description = 'Содрагающая разум боль. Двигательные функции затруднены. Смерть сейчас вам кажется привлекательней...',
+				condition = function(body)
+					return body.Pain > 80
+				end
+			},
+		}
+	},
+
+	-- =========================
+	-- АДРЕНАЛИН
+	-- =========================
+	Adrenaline = {
+		priority = 110,
+		states = {
+			{
+				id = "Adrenaline",
+				displayName = "Адреналин",
+				description = "dscAdrenaline",
+				condition = function(body)
+					return body.Adrenaline >=20 and body.Adrenaline <=65
+				end
+			},
+			{
+				id = "AdrenalineRush",
+				displayName = "Всплеск Адреналина",
+				description = "dscAdrenalineRush",
+				condition = function(body)
+					return body.Adrenaline >65
+				end
+			},
+		}
+	},
+	
+	-- =========================
+	-- ПОВРЕЖДЕННОСТЬ МОЗГА
+	-- =========================
+	BrainDamage = {
+		priority = 120,
+		states = {
+		    {
+			    id = "Cognitive",
+			    displayName = "Когнитивное нарушение",
+			    description = "dscCognitive",
+			    condition = function(body)
+				    return body.Brain <= 95 and body.Brain >=80
+			    end
+		    },
+		    {
+			    id = "NeuroDamage",
+			    displayName = "Неврологическое повреждение",
+			    description = "dscNeuroDamage",
+			    condition = function(body)
+				    return body.Brain <= 80 and body.Brain >=60
+			    end
+		    },
+		    {
+				id = "SevereNeuro",
+				displayName = "Серзьезное повреждение мозга",
+			    description = "dscSevereNeuro",
+			    condition = function(body)
+			    	return body.Brain <= 60 and body.Brain >=30
+			    end
+		    },
+		    {
+				id = "Comatose",
+				displayName = "Коматоз...",
+			    description = "dscComatose",
+			    condition = function(body)
+			    	return body.Brain < 30
+			    end
+			},
+		}
+	},
+}	
+return MoodDefs 
