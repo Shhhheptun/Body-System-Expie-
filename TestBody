@@ -4,6 +4,14 @@ local function debugLog(...)
 	print(...)
 end
 
+for player, b in 
+	pairs(require(game.ServerScriptService.BodySystem.BodyService).Bodies) do
+	do print("SERVICE BODY", b) 
+
+	end
+
+end
+
 debugLog("TESTBODY LOADED")
 
 debugLog("Before require")
@@ -14,7 +22,11 @@ local MoodService = require(game.ServerScriptService.BodySystem.MoodService)
 debugLog("After require", BodyService)
 debugLog("CreateBody exists:", BodyService.CreateBody)
 
-local body = BodyService:CreateBody(nil)
+local fakePlayer = Instance.new("Folder")
+fakePlayer.Name = "TestPlayer"
+
+
+local body = BodyService:CreateBody(fakePlayer)
 
 local function printMood()
 	
@@ -26,11 +38,17 @@ debugLog("BodyService =", BodyService)
 debugLog("MoodService =", MoodService)
 
 task.wait(1)
-body.Hunger = 121
+body.Hunger = 10
+MoodService:Evaluate(nil, body)
+print("HUNGER CHANGED TO", body.Hunger)
+print("BODY REF CHANGE", body)
+
+task.wait(1)
+body.Thirst = 10
 MoodService:Evaluate(nil, body)
 
 task.wait(1)
-body.Thirst = 40
+body.Energy = 10
 MoodService:Evaluate(nil, body)
 
 debugLog("BodyServise:", BodyService)
