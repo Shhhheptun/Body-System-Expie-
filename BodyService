@@ -37,6 +37,12 @@ BodyService.__index = BodyService
 
 BodyService.Bodies = {}
 
+function BodyService:CreateAndRegisterTestBody(key)
+	local body = BodyData.new()
+	self.Bodies[key] = body
+	print("[BodyService] Test body created for", key)
+	return body
+end
 
 function BodyService:CreateBodyForPlayer(player)
 	local body = self:CreateBody()
@@ -122,8 +128,6 @@ function BodyService:UpdateBody(body, dt)
 	-- Глобальные состояния
 	self:UpdateGlobalStates(body, dt)
 	print("Tick", body, body.Immunity)
-	print("Tick HUNGER:", body.Hunger)
-	print("Tick THIRST", body.Thirst)
 	print("BODY REF:", body)
 	
 end
