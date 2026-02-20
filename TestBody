@@ -3,7 +3,7 @@ local function debugLog(...)
 	if not DEBUG then return end
 	print(...)
 end
-
+--
 for player, b in 
 	pairs(require(game.ServerScriptService.BodySystem.BodyService).Bodies) do
 	do print("SERVICE BODY", b) 
