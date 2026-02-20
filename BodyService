@@ -37,7 +37,6 @@ BodyService.__index = BodyService
 
 BodyService.Bodies = {}
 
-local BodyData = require(game.ReplicatedStorage.BodySystem.BodyData)
 
 function BodyService:CreateBodyForPlayer(player)
 	local body = self:CreateBody()
@@ -62,6 +61,9 @@ end
 
 function BodyService:CreateBody()
 	local body = BodyData.new()
+	for k,v in pairs(BodyService.Bodies) do
+		print("BODY IN SERVICE", k, v)
+	end
 	return body
 end
 
@@ -73,10 +75,16 @@ local function clamp(value, min, max)
 	return math.max(min, math.min(value, max))
 end
 
+function BodyService:CreateTestBody()
+	local body = self:CreateBody({})
+	return body
+end
 -- ==============================
 -- UPDATE BODY
 -- ==============================
 function BodyService:UpdateBody(body, dt)
+	
+	print("TICK BODY:", body, "Hunger:", body.Hunger)
 	
 	if type(body) ~= "table" then
 		warn("BODY NOT TABLE", body)
@@ -92,12 +100,13 @@ function BodyService:UpdateBody(body, dt)
 	-- Иммунитет
 	local delta = self:CalculateImmunityDelta(body, dt)
 	
-	local growthFactor = 5 -
+	local growthFactor = 1 -
 		(body.Immunity / body.MaxImmunity)
-	  
-	    body.Immunity += delta * growthFactor * dt
-	
-	body.Immunity += delta * dt
+	 
+	 growthFactor = math.clamp(growthFactor, 0, 1)
+	 
+	body.Immunity += delta * growthFactor * dt
+
 	
 	body.Immunity = math.clamp(
 		body.Immunity,
