@@ -1,4 +1,51 @@
-  21:36:20.941  >>> ACTIVE MOODS UPDATE (EVALUATED)  -  Server - DebugMoodLogger:4
+21:36:18.853  BodyData.new started  -  Server - BodyData:9
+  21:36:18.853  BodyData.New finished  -  Server - BodyData:134
+  21:36:18.909  BodyData.new started  -  Server - BodyData:9
+  21:36:18.909  BodyData.New finished  -  Server - BodyData:134
+  21:36:18.909  [BodyService] Body created for Shhhheptun  -  Server - BodyService:46
+  21:36:18.909  [BodyService] BodyState created for Shhhheptun  -  Server - BodyService:27
+
+  21:36:19.933  === SORTED CATEGORIES ===  -  Server - MoodService:10
+  21:36:19.933  1 BrainDamage  -  Server - MoodService:10
+  21:36:19.933  2 Adrenaline  -  Server - MoodService:10
+  21:36:19.933  3 Pain  -  Server - MoodService:10
+  21:36:19.933  4 Hunger  -  Server - MoodService:10
+  21:36:19.934  5 Thirst  -  Server - MoodService:10
+  21:36:19.934  =========================  -  Server - MoodService:10
+  21:36:19.934  === SORTED CATEGORIES ===  -  Server - MoodService:10
+  21:36:19.934  1 BrainDamage  -  Server - MoodService:10
+  21:36:19.934  2 Adrenaline  -  Server - MoodService:10
+  21:36:19.934  3 Pain  -  Server - MoodService:10
+  21:36:19.934  4 Hunger  -  Server - MoodService:10
+  21:36:19.934  5 Thirst  -  Server - MoodService:10
+  21:36:19.934  =========================  -  Server - MoodService:10
+  21:36:19.934  HUNGER CHANGED TO 10  -  Server - TestBody:43
+  21:36:19.934  BODY REF CHANGE  ▶ {...}  -  Server - TestBody:44
+  21:36:19.936  >>> ACTIVE MOODS UPDATE (ADDED)  -  Server - DebugMoodLogger:10
+  21:36:19.936  BODY IS:  ▶ {...}  -  Server - DebugMoodLogger:10
+  21:36:19.937  ╔══════════ ACTIVE MOODS ══════════╗  -  Server - DebugMoodLogger:10
+  21:36:19.937  ║ Starving | Hunger | Истощён  -  Server - DebugMoodLogger:10
+  21:36:19.937  ╚══════════════════════════════════╝  -  Server - DebugMoodLogger:10
+  21:36:19.937  >>> ACTIVE MOODS UPDATE (ADDED)  -  Server - DebugMoodLogger:10
+  21:36:19.937  BODY IS:  ▶ {...}  -  Server - DebugMoodLogger:10
+  21:36:19.939  ╔══════════ ACTIVE MOODS ══════════╗  -  Server - DebugMoodLogger:10
+  21:36:19.939  ║ Starving | Hunger | Истощён  -  Server - DebugMoodLogger:10
+  21:36:19.939  ║ Slaked | Thirst | Напился  -  Server - DebugMoodLogger:10
+  21:36:19.939  ╚══════════════════════════════════╝  -  Server - DebugMoodLogger:10
+  21:36:19.939  >>> ACTIVE MOODS UPDATE (EVALUATED)  -  Server - DebugMoodLogger:4
+  21:36:19.939  BODY IS:  ▶ {...}  -  Server - DebugMoodLogger:10
+  21:36:19.941  ╔══════════ ACTIVE MOODS ══════════╗  -  Server - DebugMoodLogger:10
+  21:36:19.941  ║ Starving | Hunger | Истощён  -  Server - DebugMoodLogger:10
+  21:36:19.941  ║ Slaked | Thirst | Напился  -  Server - DebugMoodLogger:10
+  21:36:19.941  ╚══════════════════════════════════╝  -  Server - DebugMoodLogger:10
+  21:36:19.941  TICK BODY:  ▶ {...} Hunger: 100  -  Server - BodyService:87
+  21:36:19.942  Tick  ▶ {...} 100.62296653816482  -  Server - BodyService:124
+  21:36:19.944  Tick HUNGER: 100  -  Server - BodyService:125
+  21:36:19.944  Tick THIRST 100  -  Server - BodyService:126
+  21:36:19.944  BODY REF:  ▶ {...}  -  Server - BodyService:127
+  21:36:19.970  TICK BODY:  ▶ {...} Hunger: 100  -  Server - BodyService:87
+
+21:36:20.941  >>> ACTIVE MOODS UPDATE (EVALUATED)  -  Server - DebugMoodLogger:4
   21:36:20.941  BODY IS:  ▼  {
                     ["ActiveMoods"] =  ▶ {...},
                     ["Adrenaline"] = 0,
