@@ -12,7 +12,7 @@ local Players = game:GetService("Players")
 
 -- СОЗДАЁМ BodyState, ЕСЛИ ЕГО НЕТ
 
-local bodyStateFolder = bodySystem:FindFirstChild("BodyState")
+local bodyStateFolder = bodySystem:FindFirstChild("BodyState") -- от примено воооот тут
 if not bodyStateFolder then
 	bodyStateFolder = Instance.new("Folder")
 	bodyStateFolder.Name = "BodyState"
@@ -24,7 +24,7 @@ Players.PlayerAdded:Connect(function(player)
 	playerFolder.Name = tostring(player.UserId)
 	playerFolder.Parent = bodyStateFolder
 
-	print("[BodyService] BodyState created for", player.Name)
+	print("[BodyService] BodyState created for", player.Name) 
 end)
 
 
@@ -45,6 +45,12 @@ function BodyService:CreateAndRegisterTestBody(key)
 end
 
 function BodyService:CreateBodyForPlayer(player)
+	
+	if self.Bodies[player] then
+		warn("Body already exists for", player.Name)
+		return
+	end
+	
 	local body = self:CreateBody()
 	
 	self.Bodies[player] = body
@@ -67,7 +73,7 @@ end
 
 function BodyService:CreateBody()
 	local body = BodyData.new()
-	for k,v in pairs(BodyService.Bodies) do
+	for k,v in pairs(BodyService.Bodies) do -- или тут, хз если честно
 		print("BODY IN SERVICE", k, v)
 	end
 	return body
@@ -88,7 +94,7 @@ end
 -- ==============================
 -- UPDATE BODY
 -- ==============================
-function BodyService:UpdateBody(body, dt)
+function BodyService:UpdateBody(body, dt) -- Вот тут у нас пиздец творится какой то, хотя не... не тут, где то чуть выше
 	
 	print("TICK BODY:", body, "Hunger:", body.Hunger)
 	
@@ -143,7 +149,7 @@ end
 -- ИММУНИТЕТ
 -- ==============================
 
-function BodyService:CalculateImmunityDelta(stats)
+function BodyService:CalculateImmunityDelta(stats) -- а еще я чот сам не понял как он тут считает нахуй, но это еще надо тестить пока что
 
 	local delta = 0
 
@@ -200,7 +206,7 @@ local REGEN_CONFIG = {
 	Skin = {
 		NormalRate = 10,
 		CriticalRate = 60,
-		CriticalThreshold = 10,
+		CriticalThreshold = 10, -- эту хуйню я аще не тестил нихуя, вероятно она тоже работает некорректно, но пока что оно нас не ебет
 	},
 	
 	Muscle = {
