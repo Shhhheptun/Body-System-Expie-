@@ -16,17 +16,36 @@ debugLog("TESTBODY LOADED")
 
 debugLog("Before require")
 
+local Players = game:GetService("Players")
 local BodyService = require(game.ServerScriptService.BodySystem.BodyService)
 local MoodService = require(game.ServerScriptService.BodySystem.MoodService)
 
 debugLog("After require", BodyService)
 debugLog("CreateBody exists:", BodyService.CreateBody)
 
-local fakePlayer = Instance.new("Folder")
-fakePlayer.Name = "TestPlayer"
+local player = Players:GetPlayers()[1]
 
+-- ждём пока тело реально появится
+repeat task.wait() until BodyService.Bodies[player]
 
-local body = BodyService:CreateBody(fakePlayer)
+local body = BodyService.Bodies[player]
+
+print("TEST USING BODY:", body)
+
+task.wait(2)
+
+body.Hunger = 10
+MoodService:Evaluate(player, body)
+
+task.wait(1)
+
+body.Thirst = 10
+MoodService:Evaluate(player, body)
+
+task.wait(1)
+
+body.Energy = 10
+MoodService:Evaluate(player, body)
 
 local function printMood()
 	
@@ -53,3 +72,4 @@ MoodService:Evaluate(nil, body)
 
 debugLog("BodyServise:", BodyService)
 debugLog("CreateBody:", BodyService.CreateBody)
+
