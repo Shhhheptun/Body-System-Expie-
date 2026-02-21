@@ -1,3 +1,4 @@
+
 local DEBUG = true
 local function debugLog(...)
 	if not DEBUG then return end
@@ -18,7 +19,7 @@ local Players = game:GetService("Players")
 
 -- СОЗДАЁМ BodyState, ЕСЛИ ЕГО НЕТ
 
-local bodyStateFolder = bodySystem:FindFirstChild("BodyState") -- от примено воооот тут
+local bodyStateFolder = bodySystem:FindFirstChild("BodyState") 
 if not bodyStateFolder then
 	bodyStateFolder = Instance.new("Folder")
 	bodyStateFolder.Name = "BodyState"
@@ -33,17 +34,17 @@ Players.PlayerAdded:Connect(function(player)
 	print("[BodyService] BodyState created for", player.Name) 
 end)
 
-
-
 -- хранилище тел игроков
 local PlayerBodies = {}
+
+
 
 local BodyService = {}
 BodyService.__index = BodyService
 
 BodyService.Bodies = {}
 
-
+BodyService.Systems = {}
 
 function BodyService:CreateBodyForPlayer(player)
 	
@@ -64,6 +65,11 @@ end
 
 
 function BodyService:RemoveBodyForPlayer(player)
+	
+	function BodyService:RegisterSystem(name, callback)
+		self.Systems[name] = callback
+	end
+	
 	self.Bodies[player] = nil
 	print("[BodyService] Body removed for", player.Name)
 end
@@ -74,7 +80,7 @@ end
 
 function BodyService:CreateBody()
 	local body = BodyData.new()
-	for k,v in pairs(BodyService.Bodies) do -- или тут, хз если честно
+	for k,v in pairs(BodyService.Bodies) do
 		print("BODY IN SERVICE", k, v)
 	end
 	return body
@@ -92,17 +98,18 @@ end
 -- ==============================
 -- UPDATE BODY
 -- ==============================
-function BodyService:UpdateBody(body, dt) -- Вот тут у нас пиздец творится какой то, хотя не... не тут, где то чуть выше
+function BodyService:UpdateBody(body, dt) 
 	
 	if DEBUG then
 		print(string.format(
-			"H: %.1f  |  T: %.1f | E: %.1f | I % 1f",
+			"H: %.1f |  T: %.1f | E: %.1f | I %.1f",
 			body.Hunger,
 			body.Thirst,
 			body.Energy,
 			body.Immunity
 			))
 	end
+	
 	
 	
 	if type(body) ~= "table" then
