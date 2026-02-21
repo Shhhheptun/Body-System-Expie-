@@ -1,3 +1,9 @@
+local DEBUG = true
+local function debugLog(...)
+	if not DEBUG then return end
+	print(...)
+end
+
 local RunService = game:GetService("RunService")
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -88,7 +94,16 @@ end
 -- ==============================
 function BodyService:UpdateBody(body, dt) -- Вот тут у нас пиздец творится какой то, хотя не... не тут, где то чуть выше
 	
-	print("TICK BODY:", body, "Hunger:", body.Hunger)
+	if DEBUG then
+		print(string.format(
+			"H: %.1f  |  T: %.1f | E: %.1f | I % 1f",
+			body.Hunger,
+			body.Thirst,
+			body.Energy,
+			body.Immunity
+			))
+	end
+	
 	
 	if type(body) ~= "table" then
 		warn("BODY NOT TABLE", body)
