@@ -1,8 +1,59 @@
-    03:32:12.103  ServerScriptService.BodySystem.BodyService:20: attempt to index nil with 'ObservedStats'  -  Server - BodyService:20
-  03:32:12.103  Stack Begin  -  Studio
-  03:32:12.103  Script 'ServerScriptService.BodySystem.BodyService', Line 20  -  Studio - BodyService:20
-  03:32:12.103  Stack End  -  Studio
-  03:32:12.103  Requested module experienced an error while loading  -  Server - TestBody:9
-  03:32:12.103  Stack Begin  -  Studio
-  03:32:12.103  Script 'ServerScriptService.BodySystem.TestBody', Line 9  -  Studio - TestBody:9
-  03:32:12.103  Stack End  -  Studio
+  03:41:09.809  H: 75.9 | T: 75.7 | E: 40.0 | I: 96.9 | HS: 100.0 | CS: 100.0 | CM: 100.0  -  Server - BodyService:286
+  03:41:10.807  Body:  ▶ {...}  -  Server - BodyService:285
+  03:41:10.809  H: 75.8 | T: 75.6 | E: 40.0 | I: 96.8 | HS: 100.0 | CS: 100.0 | CM: 100.0  -  Server - BodyService:286
+  03:41:11.824  Body:  ▶ {...}  -  Server - BodyService:285
+  03:41:11.825  H: 75.8 | T: 75.4 | E: 40.0 | I: 96.8 | HS: 100.0 | CS: 100.0 | CM: 100.0  -  Server - BodyService:286
+  03:41:12.840  Body:  ▶ {...}  -  Server - BodyService:285
+  03:41:12.842  H: 75.7 | T: 75.3 | E: 40.0 | I: 96.7 | HS: 100.0 | CS: 100.0 | CM: 100.0  -  Server - BodyService:286
+  03:41:13.857  Body:  ▶ {...}  -  Server - BodyService:285
+  03:41:13.859  H: 75.7 | T: 75.2 | E: 40.0 | I: 96.6 | HS: 100.0 | CS: 100.0 | CM: 100.0  -  Server - BodyService:286
+  03:41:14.874  Body:  ▶ {...}  -  Server - BodyService:285
+  03:41:14.875  H: 75.6 | T: 75.1 | E: 40.0 | I: 96.6 | HS: 100.0 | CS: 100.0 | CM: 100.0  -  Server - BodyService:286
+  03:41:15.874  Body:  ▶ {...}  -  Server - BodyService:285
+  03:41:15.875  H: 75.6 | T: 75.0 | E: 40.0 | I: 96.5 | HS: 100.0 | CS: 100.0 | CM: 100.0  -  Server - BodyService:286
+  03:41:16.890  Body:  ▶ {...}  -  Server - BodyService:285
+  03:41:16.891  H: 75.6 | T: 74.9 | E: 40.0 | I: 96.4 | HS: 100.0 | CS: 100.0 | CM: 100.0  -  Server - BodyService:286
+  03:41:17.907  Body:  ▶ {...}  -  Server - BodyService:285
+  03:41:17.908  H: 75.5 | T: 74.8 | E: 40.0 | I: 96.4 | HS: 100.0 | CS: 100.0 | CM: 100.0  -  Server - BodyService:286
+  03:41:18.907  Body:  ▶ {...}  -  Server - BodyService:285
+  03:41:18.909  H: 75.5 | T: 74.7 | E: 40.0 | I: 96.3 | HS: 100.0 | CS: 100.0 | CM: 100.0  -  Server - BodyService:286
+  03:41:19.923  Body:  ▶ {...}  -  Server - BodyService:285
+  03:41:19.925  H: 75.4 | T: 74.6 | E: 40.0 | I: 96.2 | HS: 100.0 | CS: 100.0 | CM: 100.0  -  Server - BodyService:286
+  03:41:20.923  Body:  ▶ {...}  -  Server - BodyService:285
+  03:41:20.924  H: 75.4 | T: 74.5 | E: 40.0 | I: 96.2 | HS: 100.0 | CS: 100.0 | CM: 100.0  -  Server - BodyService:286
+  03:41:21.940  Body:  ▶ {...}  -  Server - BodyService:285
+  03:41:21.942  H: 75.3 | T: 74.3 | E: 40.0 | I: 96.1 | HS: 100.0 | CS: 100.0 | CM: 100.0  -  Server - BodyService:286
+  03:41:22.940  Body:  ▶ {...}  -  Server - BodyService:285
+  03:41:22.941  H: 75.3 | T: 74.2 | E: 40.0 | I: 96.0 | HS: 100.0 | CS: 100.0 | CM: 100.0  -  Server - BodyService:286
+  03:41:23.957  Body:  ▶ {...}  -  Server - BodyService:285
+  03:41:23.958  H: 75.3 | T: 74.1 | E: 40.0 | I: 96.0 | HS: 100.0 | CS: 100.0 | CM: 100.0  -  Server - BodyService:286
+  03:41:24.973  Body:  ▶ {...}  -  Server - BodyService:285
+  03:41:24.975  H: 75.2 | T: 74.0 | E: 40.0 | I: 95.9 | HS: 100.0 | CS: 100.0 | CM: 100.0  -  Server - BodyService:286
+  03:41:25.989  Body:  ▶ {...}  -  Server - BodyService:285
+  03:41:25.991  H: 75.2 | T: 73.9 | E: 40.0 | I: 95.8 | HS: 100.0 | CS: 100.0 | CM: 100.0  -  Server - BodyService:286
+  03:41:27.006  Body:  ▶ {...}  -  Server - BodyService:285
+  03:41:27.008  H: 75.1 | T: 73.8 | E: 40.0 | I: 95.8 | HS: 100.0 | CS: 100.0 | CM: 100.0  -  Server - BodyService:286
+  03:41:28.023  Body:  ▶ {...}  -  Server - BodyService:285
+  03:41:28.025  H: 75.1 | T: 73.7 | E: 40.0 | I: 95.7 | HS: 100.0 | CS: 100.0 | CM: 100.0  -  Server - BodyService:286
+  03:41:29.023  Body:  ▶ {...}  -  Server - BodyService:285
+  03:41:29.025  H: 75.0 | T: 73.6 | E: 40.0 | I: 95.6 | HS: 100.0 | CS: 100.0 | CM: 100.0  -  Server - BodyService:286
+  03:41:30.040  Body:  ▶ {...}  -  Server - BodyService:285
+  03:41:30.041  H: 75.0 | T: 73.5 | E: 40.0 | I: 95.6 | HS: 100.0 | CS: 100.0 | CM: 100.0  -  Server - BodyService:286
+  03:41:31.057  Body:  ▶ {...}  -  Server - BodyService:285
+  03:41:31.058  H: 74.9 | T: 73.4 | E: 40.0 | I: 95.5 | HS: 100.0 | CS: 100.0 | CM: 100.0  -  Server - BodyService:286
+  03:41:32.073  Body:  ▶ {...}  -  Server - BodyService:285
+  03:41:32.074  H: 74.9 | T: 73.2 | E: 40.0 | I: 95.4 | HS: 100.0 | CS: 100.0 | CM: 100.0  -  Server - BodyService:286
+  03:41:33.089  Body:  ▶ {...}  -  Server - BodyService:285
+  03:41:33.091  H: 74.9 | T: 73.1 | E: 40.0 | I: 95.4 | HS: 100.0 | CS: 100.0 | CM: 100.0  -  Server - BodyService:286
+  03:41:34.106  Body:  ▶ {...}  -  Server - BodyService:285
+  03:41:34.108  H: 74.8 | T: 73.0 | E: 40.0 | I: 95.3 | HS: 100.0 | CS: 100.0 | CM: 100.0  -  Server - BodyService:286
+  03:41:35.123  Body:  ▶ {...}  -  Server - BodyService:285
+  03:41:35.125  H: 74.8 | T: 72.9 | E: 40.0 | I: 95.3 | HS: 100.0 | CS: 100.0 | CM: 100.0  -  Server - BodyService:286
+  03:41:36.123  Body:  ▶ {...}  -  Server - BodyService:285
+  03:41:36.125  H: 74.7 | T: 72.8 | E: 40.0 | I: 95.2 | HS: 100.0 | CS: 100.0 | CM: 100.0  -  Server - BodyService:286
+  03:41:37.140  Body:  ▶ {...}  -  Server - BodyService:285
+  03:41:37.142  H: 74.7 | T: 72.7 | E: 40.0 | I: 95.1 | HS: 100.0 | CS: 100.0 | CM: 100.0  -  Server - BodyService:286
+  03:41:38.156  Body:  ▶ {...}  -  Server - BodyService:285
+  03:41:38.158  H: 74.6 | T: 72.6 | E: 40.0 | I: 95.1 | HS: 100.0 | CS: 100.0 | CM: 100.0  -  Server - BodyService:286
+  03:41:39.173  Body:  ▶ {...}  -  Server - BodyService:285
+  03:41:39.174  H: 74.6 | T: 72.5 | E: 40.0 | I: 95.0 | HS: 100.0 | CS: 100.0 | CM: 100.0  -  Server - BodyService:286
