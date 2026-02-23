@@ -4,7 +4,8 @@ local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 
-local bodySystem = ReplicatedStorage:WaitForChild("BodySystem")
+local ServerScriptService = game:GetService("ServerScriptService")
+local bodySystem = ServerScriptService:WaitForChild("BodySystem")
 local MoodService = require(bodySystem:WaitForChild("MoodService"))
 
 --// Modules
@@ -50,7 +51,7 @@ function BodyService:CreateBodyForPlayer(player)
 
 	local body = BodyData.new()
 	body.Player = player
-	body.NeedsMoodUpdate = true
+	body.NeedsMoodUpdate = false
 	self.Bodies[player] = body
 
 	print("[BodyService] Body created for", player.Name)
@@ -120,51 +121,40 @@ end
 
 function BodyService:UpdateLimbRegen(limb, dt)
 
-	function BodyService:UpdateLimbRegen(limb, dt)
+	local skinRegenRate = 0.1
+	local muscleRegenRate = 0.075
 
-		-- БАЗОВЫЕ СКОРОСТИ (в секунду)
-		local skinRegenRate = 0.1
-		local muscleRegenRate = 0.075
+	-- КОЖА
+	if limb.Skin < Config.Global.MAX_SKIN then
+		local finalSkinRate = skinRegenRate
 
-		-- =========================
-		-- КОЖА
-		-- =========================
-		if limb.Skin < Config.Global.MAX_SKIN then
-
-			local finalSkinRate = skinRegenRate
-
-			-- если кожа < 10 → замедляем в 10 раз
-			if limb.Skin < 10 then
-				finalSkinRate *= 0.1
-			end
-
-			limb.Skin = math.clamp(
-				limb.Skin + finalSkinRate * dt,
-				Config.Global.MIN_SKIN,
-				Config.Global.MAX_SKIN
-			)
+		if limb.Skin < 10 then
+			finalSkinRate *= 0.1
 		end
 
-		-- =========================
-		-- МЫШЦЫ
-		-- =========================
-		if limb.Muscle < Config.Global.MAX_MUSCLE then
+		limb.Skin = math.clamp(
+			limb.Skin + finalSkinRate * dt,
+			Config.Global.MIN_SKIN,
+			Config.Global.MAX_SKIN
+		)
+	end
 
-			local finalMuscleRate = muscleRegenRate
+	-- МЫШЦЫ
+	if limb.Muscle < Config.Global.MAX_MUSCLE then
+		local finalMuscleRate = muscleRegenRate
 
-			-- если мышцы < 10 → замедляем в 10 раз
-			if limb.Muscle < 10 then
-				finalMuscleRate *= 0.1
-			end
-
-			limb.Muscle = math.clamp(
-				limb.Muscle + finalMuscleRate * dt,
-				Config.Global.MIN_MUSCLE,
-				Config.Global.MAX_MUSCLE
-			)
+		if limb.Muscle < 10 then
+			finalMuscleRate *= 0.1
 		end
+
+		limb.Muscle = math.clamp(
+			limb.Muscle + finalMuscleRate * dt,
+			Config.Global.MIN_MUSCLE,
+			Config.Global.MAX_MUSCLE
+		)
 	end
 end
+
 -- ==============================
 -- GLOBAL STATES
 -- ==============================
@@ -210,17 +200,14 @@ function BodyService:UpdateBody(body, dt)
 	end
 	
 	local oldImmunity = body.Immunity
-	body.Immunity = self:CalculateImmunityValue(body)
+	local newImmunity = self:CalculateImmunityValue(body)
 
-	if math.abs(body.Immunity - oldImmunity) > 0.01 then
+	if math.abs(newImmunity - oldImmunity) > 0.01 then
 		body.NeedsMoodUpdate = true
 	end
-	
-	-- ==== IMMUNITY CALCULATE ====
-	body.Immunity = self:CalculateImmunityValue(body)
 
 	body.Immunity = math.clamp(
-		body.Immunity,
+		newImmunity,
 		body.MinImmunity,
 		body.MaxImmunity
 	)
