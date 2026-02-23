@@ -1,5 +1,18 @@
- 01:10:16.480  Infinite yield possible on 'ReplicatedStorage.BodySystem:WaitForChild("MoodService")'  -  Studio
-  01:10:16.481  Stack Begin  -  Studio
-  01:10:16.481  Script 'ServerScriptService.BodySystem.BodyService', Line 8  -  Studio - BodyService:8
-  01:10:16.481  Stack End  -  Studio
-  01:10:18.749  Disconnect from 127.0.0.1|62982  -  Studio
+  03:07:07.606  Body:  ▶ {...}  -  Server - BodyService:270
+  03:07:07.608  H: 80.0 | T: 80.0 | E: 40.0 | I: 73.3 | HS: 100.0 | CS: 100.0 | CM: 100.0  -  Server - BodyService:271
+  03:07:07.608  BODY IS:  ▶ {...}  -  Server - DebugMoodLogger:10
+  03:07:07.609  ╔══════════ ACTIVE MOODS ══════════╗  -  Server - DebugMoodLogger:10
+  03:07:07.609  ║ (none)  -  Server - DebugMoodLogger:10
+  03:07:07.609  ╚══════════════════════════════════╝  -  Server - DebugMoodLogger:10
+  03:07:08.618  Body:  ▶ {...}  -  Server - BodyService:270
+  03:07:08.619  H: 80.0 | T: 80.0 | E: 40.0 | I: 73.3 | HS: 100.0 | CS: 100.0 | CM: 100.0  -  Server - BodyService:271
+  03:07:09.634  Body:  ▶ {...}  -  Server - BodyService:270
+  03:07:09.636  H: 80.0 | T: 80.0 | E: 40.0 | I: 73.3 | HS: 100.0 | CS: 100.0 | CM: 100.0  -  Server - BodyService:271
+  03:07:10.635  Body:  ▶ {...}  -  Server - BodyService:270
+  03:07:10.637  H: 80.0 | T: 80.0 | E: 40.0 | I: 73.3 | HS: 100.0 | CS: 100.0 | CM: 100.0  -  Server - BodyService:271
+  03:07:11.651  Body:  ▶ {...}  -  Server - BodyService:270
+  03:07:11.652  H: 80.0 | T: 80.0 | E: 40.0 | I: 73.3 | HS: 100.0 | CS: 100.0 | CM: 100.0  -  Server - BodyService:271
+  03:07:12.668  Body:  ▶ {...}  -  Server - BodyService:270
+  03:07:12.669  H: 80.0 | T: 80.0 | E: 40.0 | I: 73.3 | HS: 100.0 | CS: 100.0 | CM: 100.0  -  Server - BodyService:271
+  03:07:13.685  Body:  ▶ {...}  -  Server - BodyService:270
+  03:07:13.687  H: 80.0 | T: 80.0 | E: 40.0 | I: 73.3 | HS: 100.0 | CS: 100.0 | CM: 100.0  -  Server - BodyService:271
