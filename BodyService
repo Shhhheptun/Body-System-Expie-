@@ -1,5 +1,7 @@
 local DEBUG = true
 
+
+
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 
@@ -14,6 +16,8 @@ local MoodService = require(BodySystem:WaitForChild("MoodService"))
 local bodySystem = ReplicatedStorage:WaitForChild("BodySystem")
 local Config = require(bodySystem:WaitForChild("Expie_Config"))
 local BodyData = require(bodySystem:WaitForChild("BodyData"))
+
+
 
 -- ==============================
 -- BODY STATE FOLDER
@@ -40,6 +44,15 @@ local BodyService = {}
 BodyService.__index = BodyService
 
 BodyService.Bodies = {}
+
+BodyService.ObservedStats = {
+	Hunger = 0.01,
+	Thirst = 0.01,
+	Energy = 0.01,
+	Immunity = 0.01,
+	Temperature = 0.01,
+	HasAntibiotics = 0
+}
 
 -- ==============================
 -- CREATE / REMOVE
@@ -195,7 +208,7 @@ local logTimer = 0 -- для логирования раз в секунду
 
 function BodyService:UpdateVitals(body, dt)
 	
-	self:UpdateVitals(body, dt)
+
 
 	-- =====================
 	-- HUNGER
@@ -235,6 +248,8 @@ function BodyService:UpdateBody(body, dt)
 		warn("BODY NOT TABLE", body)
 		return
 	end
+	
+	self:UpdateVitals(body, dt)
 	
 	local oldImmunity = body.Immunity
 	local newImmunity = self:CalculateImmunityValue(body)
@@ -281,6 +296,47 @@ function BodyService:UpdateBody(body, dt)
 		end
 	end
 end
+
+-- ==============================
+-- OBSERVED STATS
+-- ==============================
+function BodyService:CheckObservedStats(body)
+
+	body._LastSnapshot = body._LastSnapshot or {}
+
+	for stat, tolerance in pairs(self.ObservedStats) do
+
+		local current = body[stat]
+		local last = body._LastSnapshot[stat]
+
+		if last == nil then
+			body._LastSnapshot[stat] = current
+		else
+			local changed = false
+
+			if type(current) == "number" then
+				if math.abs(current - last) > tolerance then
+					changed = true
+				end
+			else
+				if current ~= last then
+					changed = true
+				end
+			end
+			self:CheckObservedStats(body)
+			if changed then
+				body._LastSnapshot[stat] = current
+				body.NeedsMoodUpdate = true
+
+				if DEBUG then
+					print("[OBSERVED DIRTY]", body.Player.Name, stat)
+				end
+			end
+		end
+	end
+end
+
+
 
 -- ==============================
 -- PLAYER HOOKS
