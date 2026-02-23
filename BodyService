@@ -1,14 +1,17 @@
 local DEBUG = true
 
 local RunService = game:GetService("RunService")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
-local bodySystem = ServerScriptService:WaitForChild("BodySystem")
-local MoodService = require(bodySystem:WaitForChild("MoodService"))
 
---// Modules
+-- SERVER SIDE SYSTEM
+local BodySystem = ServerScriptService:WaitForChild("BodySystem")
+local MoodService = require(BodySystem:WaitForChild("MoodService"))
+
+-- SHARED MODULES
+local bodySystem = ReplicatedStorage:WaitForChild("BodySystem")
 local Config = require(bodySystem:WaitForChild("Expie_Config"))
 local BodyData = require(bodySystem:WaitForChild("BodyData"))
 
@@ -190,7 +193,41 @@ end
 
 local logTimer = 0 -- для логирования раз в секунду
 
+function BodyService:UpdateVitals(body, dt)
+	
+	self:UpdateVitals(body, dt)
 
+	-- =====================
+	-- HUNGER
+	-- =====================
+	local hungerDrain = 2.6 / 60
+	body.Hunger = math.clamp(
+		body.Hunger - hungerDrain * dt,
+		0,
+		100
+	)
+
+	-- =====================
+	-- THIRST
+	-- =====================
+	local normalTemp = 36.6
+	local baseDenominator = 17
+
+	local tempDelta = body.Temperature - normalTemp
+
+	local denominator = baseDenominator - (tempDelta * 2)
+
+	-- ограничиваем чтобы не сломалось
+	denominator = math.clamp(denominator, 8, 40)
+
+	local thirstDrainPerSecond = 1 / denominator
+
+	body.Thirst = math.clamp(
+		body.Thirst - thirstDrainPerSecond * dt,
+		0,
+		100
+	)
+end
 
 function BodyService:UpdateBody(body, dt)
 
