@@ -5,6 +5,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 
 local bodySystem = ReplicatedStorage:WaitForChild("BodySystem")
+local MoodService = require(bodySystem:WaitForChild("MoodService"))
 
 --// Modules
 local Config = require(bodySystem:WaitForChild("Expie_Config"))
@@ -48,6 +49,8 @@ function BodyService:CreateBodyForPlayer(player)
 	end
 
 	local body = BodyData.new()
+	body.Player = player
+	body.NeedsMoodUpdate = true
 	self.Bodies[player] = body
 
 	print("[BodyService] Body created for", player.Name)
@@ -117,25 +120,51 @@ end
 
 function BodyService:UpdateLimbRegen(limb, dt)
 
-	if limb.Infection <= 0 then
-		if limb.Skin < Config.Global.MAX_SKIN then
-			limb.RegenTimer += dt
-			if limb.RegenTimer >= 1 then
-				limb.RegenTimer = 0
-				limb.Skin += 1
-			end
-		end
-	end
+	function BodyService:UpdateLimbRegen(limb, dt)
 
-	if limb.Muscle < Config.Global.MAX_MUSCLE then
-		limb.RegenTimer += dt
-		if limb.RegenTimer >= 1 then
-			limb.RegenTimer = 0
-			limb.Muscle += 1
+		-- БАЗОВЫЕ СКОРОСТИ (в секунду)
+		local skinRegenRate = 0.1
+		local muscleRegenRate = 0.075
+
+		-- =========================
+		-- КОЖА
+		-- =========================
+		if limb.Skin < Config.Global.MAX_SKIN then
+
+			local finalSkinRate = skinRegenRate
+
+			-- если кожа < 10 → замедляем в 10 раз
+			if limb.Skin < 10 then
+				finalSkinRate *= 0.1
+			end
+
+			limb.Skin = math.clamp(
+				limb.Skin + finalSkinRate * dt,
+				Config.Global.MIN_SKIN,
+				Config.Global.MAX_SKIN
+			)
+		end
+
+		-- =========================
+		-- МЫШЦЫ
+		-- =========================
+		if limb.Muscle < Config.Global.MAX_MUSCLE then
+
+			local finalMuscleRate = muscleRegenRate
+
+			-- если мышцы < 10 → замедляем в 10 раз
+			if limb.Muscle < 10 then
+				finalMuscleRate *= 0.1
+			end
+
+			limb.Muscle = math.clamp(
+				limb.Muscle + finalMuscleRate * dt,
+				Config.Global.MIN_MUSCLE,
+				Config.Global.MAX_MUSCLE
+			)
 		end
 	end
 end
-
 -- ==============================
 -- GLOBAL STATES
 -- ==============================
@@ -171,6 +200,8 @@ end
 
 local logTimer = 0 -- для логирования раз в секунду
 
+
+
 function BodyService:UpdateBody(body, dt)
 
 	if type(body) ~= "table" then
@@ -178,7 +209,14 @@ function BodyService:UpdateBody(body, dt)
 		return
 	end
 	
-	-- ==== IMMUNITY (БЕЗ ЗАТУХАНИЯ) ====
+	local oldImmunity = body.Immunity
+	body.Immunity = self:CalculateImmunityValue(body)
+
+	if math.abs(body.Immunity - oldImmunity) > 0.01 then
+		body.NeedsMoodUpdate = true
+	end
+	
+	-- ==== IMMUNITY CALCULATE ====
 	body.Immunity = self:CalculateImmunityValue(body)
 
 	body.Immunity = math.clamp(
@@ -194,19 +232,27 @@ function BodyService:UpdateBody(body, dt)
 
 	-- ==== GLOBAL STATES ====
 	self:UpdateGlobalStates(body)
+	
+	if body.NeedsMoodUpdate then
+		body.NeedsMoodUpdate = false
+		MoodService:Evaluate(body.Player, body)
+	end
 
 	-- ==== DEBUG LOG (1 РАЗ В СЕКУНДУ) ====
 	if DEBUG then
 		logTimer += dt
 		if logTimer >= 1 then
 			logTimer = 0
-			print(body)
+			print("Body:",body)
 			print(string.format(
-				"H: %.1f | T: %.1f | E: %.1f | I: %.1f",
+				"H: %.1f | T: %.1f | E: %.1f | I: %.1f | HS: %.1f | CS: %.1f | CM: %.1f",
 				body.Hunger,
 				body.Thirst,
 				body.Energy,
-				body.Immunity
+				body.Immunity,
+				body.Parts.Head.Skin,
+				body.Parts.Chest.Skin,
+				body.Parts.Chest.Muscle
 				))
 		end
 	end
@@ -240,4 +286,4 @@ end
 
 BodyService:Start()
 
-return BodyService	
+return BodyService
