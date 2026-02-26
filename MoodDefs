@@ -5,54 +5,54 @@ local MoodDefs = {
 	-- ГОЛОД
 	-- =========================
 	Hunger = {
-		priority = 50,
+		priority = 1,
 		states = {
 			{
 				id = "Satiated",
 				displayName = "Наелся",
-				description = '"Вы хорошо поели сегодня! Голод появляется медленней в полтара раза"', 
+				description = "Вы хорошо поели сегодня! Голод появляется медленней в полтара раза", 
 				condition = function(body)
-					return body.Hunger >= 100 and body.Hunger <= 120
+					return body.Hunger > 100 and body.Hunger < 120
 				end
 			},
 			{
 				id = "Full",
 				displayName = "Переел",
-				description = '"Ты переел! В тебя больше не лезет"',
+				description = "Ты переел! В тебя больше не лезет",
 				condition = function(body)
-					return body.Hunger >= 120 and body.Hunger <= 125
+					return body.Hunger > 120 and body.Hunger < 125
 				end
 			},
 			{
 				id = "Peckish",
 				displayName = "Проголодался",
-				description = '"Пора перекусить."',
+				description = "Пора перекусить",
 				condition = function(body)
-					return body.Hunger <= 75 and body.Hunger >= 50
+					return body.Hunger < 75 and body.Hunger > 50
 				end
 			},
 			{
 				id = "Hungry",
 				displayName = "Голодный",
-				description = '"Неприятный голод. Немного слабее обычного"',
+				description = "Неприятный голод. Немного слабее обычного",
 				condition = function(body)
-					return body.Hunger <= 50 and body.Hunger >= 35
+					return body.Hunger < 50 and body.Hunger > 35
 				end
 			},
 			{
 				id = "VeryHungry",
 				displayName = "Сильно голоден",
-				description = '"Чертовски голоден... Ещё немного и тело твое начнет саморазрушаться. Слабее обычного..."',
+				description = "Чертовски голоден... Ещё немного и тело твое начнет саморазрушаться. Слабее обычного...",
 				condition = function(body)
-					return body.Hunger <= 35 and body.Hunger >= 15
+					return body.Hunger < 35 and body.Hunger > 15
 				end
 			},
 			{
 				id = "Starving",
 				displayName = "Истощён",
-				description = '"Тело поедает само себя... Отказ органов неизбежен..."',
+				description = "Тело поедает само себя... Отказ органов неизбежен...",
 				condition = function(body)
-					return body.Hunger <= 15 and body.Hunger >= -50
+					return body.Hunger < 15 and body.Hunger > -50
 				end
 			},
 		}
@@ -61,14 +61,14 @@ local MoodDefs = {
 	-- ЖАЖДА
 	-- =========================
 	Thirst = {
-		priority = 50,
+		priority = 2,
 		states = {
 			{
 				id = "WaterIntoxicated",
 				displayName = "Водная интоксикация",
 				description = "dscWaterIntoxicated",
 				condition = function(body)
-					return body.Thirst >= 150 and body.Thirst <= 200
+					return body.Thirst > 150 and body.Thirst < 200
 				end
 			},
 			{
@@ -76,7 +76,7 @@ local MoodDefs = {
 				displayName = "Перепил",
 				description = "dscOverhydrated",
 				condition = function(body)
-					return body.Thirst >= 125 and body.Thirst <= 150
+					return body.Thirst > 125 and body.Thirst < 150
 				end
 			},		
 			{
@@ -84,7 +84,7 @@ local MoodDefs = {
 				displayName = "Напился",
 				description = "dscSlaked",
 				condition = function(body)
-					return body.Thirst >= 100 and body.Thirst <= 125
+					return body.Thirst > 100 and body.Thirst < 125
 				end
 			},		
 			{
@@ -92,7 +92,7 @@ local MoodDefs = {
 				displayName = "Жажда",
 				description = "dscThirsty",
 				condition = function(body)
-					return body.Thirst <= 75 and body.Thirst >= 55
+					return body.Thirst < 75 and body.Thirst > 55
 				end
 			},
 			{
@@ -100,7 +100,7 @@ local MoodDefs = {
 				displayName = "Обезвожен",
 				description = "dscDehydrated",
 				condition = function(body)
-					return body.Thirst <= 55 and body.Thirst >= 35
+					return body.Thirst < 55 and body.Thirst > 35
 				end
 			},
 			{
@@ -108,7 +108,7 @@ local MoodDefs = {
 				displayName = "Пересохший",
 				description = "dscParched",
 				condition = function(body)
-					return body.Thirst <= 35 and body.Thirst >= 20
+					return body.Thirst < 35 and body.Thirst > 20
 				end
 			},
 			{
@@ -116,7 +116,7 @@ local MoodDefs = {
 				displayName = "Иссушенный",
 				description = "dscDesiccated",
 				condition = function(body)
-					return body.Thirst <= 20 and body.Thirst >= -25
+					return body.Thirst < 20 and body.Thirst > -25
 				end
 			},
 		}
@@ -126,36 +126,36 @@ local MoodDefs = {
 	-- БОЛЬ
 	-- =========================
 	Pain = {
-		priority = 100,
+		priority = 3,
 		states = {
 			{
 				id = "MinorDiscomfort",
 				displayName = "Небольшой дискомфорт",
-				description = 'Вам немного больно. Ауч...', 
+				description = "Вам немного больно. Ауч...", 
 				condition = function(body)
-					return body.Pain >= 10 and body.Pain <= 30
+					return body.Pain > 10 and body.Pain < 30
 				end
 			},
 			{
 				id = "Pain",
 				displayName = "Боль",
-				description = 'Весьма больно!',
+				description = "Весьма больно!",
 				condition = function(body)
-					return body.Pain >= 30 and body.Pain <= 55
+					return body.Pain > 30 and body.Pain < 55
 				end
 			},
 			{
 				id = "StrongPain",
 				displayName = "Сильная боль",
-				description = 'Находясь в полубессознательном состоянии, ваш разум затуманен болью...',
+				description = "Находясь в полубессознательном состоянии, ваш разум затуманен болью...",
 				condition = function(body)
-					return body.Pain >= 55 and body.Pain <= 80
+					return body.Pain > 55 and body.Pain < 80
 				end
 			},
 			{
 				id = "Agony",
 				displayName = "Агония", 
-				description = 'Содрагающая разум боль. Двигательные функции затруднены. Смерть сейчас вам кажется привлекательней...',
+				description = "Содрагающая разум боль. Двигательные функции затруднены. Смерть сейчас вам кажется привлекательней...",
 				condition = function(body)
 					return body.Pain > 80
 				end
@@ -167,14 +167,14 @@ local MoodDefs = {
 	-- АДРЕНАЛИН
 	-- =========================
 	Adrenaline = {
-		priority = 110,
+		priority = 4,
 		states = {
 			{
 				id = "Adrenaline",
 				displayName = "Адреналин",
 				description = "dscAdrenaline",
 				condition = function(body)
-					return body.Adrenaline >=20 and body.Adrenaline <=65
+					return body.Adrenaline > 20 and body.Adrenaline < 65
 				end
 			},
 			{
@@ -182,7 +182,7 @@ local MoodDefs = {
 				displayName = "Всплеск Адреналина",
 				description = "dscAdrenalineRush",
 				condition = function(body)
-					return body.Adrenaline >65
+					return body.Adrenaline > 65
 				end
 			},
 		}
@@ -192,14 +192,14 @@ local MoodDefs = {
 	-- ПОВРЕЖДЕННОСТЬ МОЗГА
 	-- =========================
 	BrainDamage = {
-		priority = 120,
+		priority = 5,
 		states = {
 		    {
 			    id = "Cognitive",
 			    displayName = "Когнитивное нарушение",
 			    description = "dscCognitive",
 			    condition = function(body)
-				    return body.Brain <= 95 and body.Brain >=80
+				    return body.Brain < 95 and body.Brain > 80
 			    end
 		    },
 		    {
@@ -207,7 +207,7 @@ local MoodDefs = {
 			    displayName = "Неврологическое повреждение",
 			    description = "dscNeuroDamage",
 			    condition = function(body)
-				    return body.Brain <= 80 and body.Brain >=60
+				    return body.Brain < 80 and body.Brain > 60
 			    end
 		    },
 		    {
@@ -215,7 +215,7 @@ local MoodDefs = {
 				displayName = "Серзьезное повреждение мозга",
 			    description = "dscSevereNeuro",
 			    condition = function(body)
-			    	return body.Brain <= 60 and body.Brain >=30
+			    	return body.Brain < 60 and body.Brain > 30
 			    end
 		    },
 		    {
@@ -228,5 +228,245 @@ local MoodDefs = {
 			},
 		}
 	},
-}	
-return MoodDefs 
+	
+	-- =========================
+	-- ИММУНИТЕТ
+	-- =========================
+	Immunity = {
+		priority = 6,
+		states = {
+			{
+				id = "Immunocompetent",
+				displayName = "Иммунокомпетентный",
+				description = "dscImmunocompetent",
+				condition = function(body)
+					return body.Immunity > 150
+				end
+			},
+			{
+				id = "Immunocompromised",
+				displayName = "Иммунодефицит",
+				description = "dscImmunocompromised",
+				condition = function(body)
+					return body.Immunity < 50
+				end,
+			},
+		}
+	},
+	
+	-- =========================
+	-- ОСТАНВКА ДЫХАНИЯ
+	-- =========================
+	RespiratoryArrest = {
+		priority = 7,
+		states = {
+			{
+				id = "RespiratoryArrest",
+				displayName = "Остановка дыхания",
+				description = "dscRespiratoryArrest",
+				condition = function(body)
+					return body.OxygenBlocked == true
+				end,
+			},
+		}
+	},
+	
+	-- =========================
+	-- ОТКАЗ ЛЕГКИХ
+	-- =========================
+	LungFailure = {
+		priority = 8,
+		states = {
+			{
+				id = "LungFailure",
+				displayName = "Отказ легких",
+				description = "dscLungFailure",
+				condition = function(body)
+					return body.Parts.Chest.Muscle <= 4
+				end,
+			},
+		}
+	},
+	
+	-- =========================
+	-- ГИПОКСЕМИЯ
+	-- =========================
+	Hypoxemia = {
+		priority = 9,
+		states = {
+			{
+				id = "Hypoxemic",
+				displayName = "Гипоксемия",
+				description = "dscHypoxemia",
+				condition = function(body)
+					return body.Oxygen < 90 and body.Oxygen > 60
+				end,
+			},
+			{
+				id = "VeryHypoxemic",
+				displayName = "Сильная гипоксемия",
+				description = "dscVeryHypoxemic",
+				condition = function(body)
+					return body.Oxygen < 60 and body.Oxygen > 30
+				end,	
+			},
+			{
+				id = "Asphyxiating",
+				displayName = "Удушье",
+				description = "dscAsphyxiating",
+				condition = function(body)
+					return body.Oxygen < 30 and body.Oxygen > 5
+				end,	
+			},
+			{
+				id = "Cardiac Arrest",
+				displayName = "Остановка сердца",
+				decription = "dscCardiacArrest",
+				condition = function(body)
+					return body.Oxygen < 5
+				end,	
+			},
+		}
+	},		
+	
+	-- =========================
+	-- ТЕМПЕРАТУРА
+	-- =========================
+	Temperature = {
+		priority = 10,
+		states = {
+			{
+				id = "FreezingToDeath",
+				displayName = "Холодная смерть",
+				description = "dscFreezingToDeath",
+				condition = function(body)
+					return body.Temperature < 28
+				end,
+			},
+			{
+				id = "Hypothermia",
+				displayName = "Гипотермия",
+				description = "dscHypothermia",
+				condition = function(body)
+					return body.Temperature < 32.5 and body.Temperature > 28
+				end,
+			},
+			{
+				id = "Cold",
+				displayName = "Холодно",
+				description = "dscCold",
+				condition = function(body)
+					return body.Temperature < 34 and body.Temperature > 32.5
+				end,
+			},
+			{
+				id = "Chilly",
+				displayName = "Прохладно",
+				description = "dscChilly",
+				condition = function(body)
+					return body.Temperature < 35.5 and body.Temperature > 34
+				end,
+			},
+			{
+				id = "Warm",
+				displayName = "Тепло",
+				description = "dscWarm",
+				condition = function(body)
+					return body.Temperature > 37 and body.Temperature < 38.5
+				end,
+			},
+			{
+				id = "Hot",
+				displayName = "Жар",
+				description = "dscHot",
+				condition = function(body)
+					return body.Temperature > 38.5 and body.Temperature < 40.2
+				end,
+			},
+			{
+				id = "Hyperthermia",
+				displayName = "Гипертермия",
+				description = "dscHyperthermia",
+				condition = function(body)
+					return body.Temperature > 40.2 and body.Temperature < 41.5
+				end,
+			},
+			{
+				id = "HeatStroke",
+				displayName = "Тепловой удар",
+				description = "dscHeatStroke",
+				condition = function(body)
+					return body.Temperature > 41.5
+				end,
+			},
+		}
+	},
+	
+	-- =========================
+	-- БОДРЫЙ
+	-- =========================
+	Energized = {
+		priority = 11,
+		states = {
+		    {
+			    id = "Energized",
+			    displayName = "Бодрый",
+			    description = "dscEnergized",
+			    condition = function(body)
+			        return body.Caffeination > 0
+			    end,	
+			},
+		}
+	},
+
+	
+	-- =========================
+	-- СОН
+	-- =========================
+	Drowsy = {
+		priotity = 12,
+		states = {
+		    {
+			    id = "Drowsy",
+			    displayName = "Сонный",
+			    description = "Спать охота...",
+			    condition = function(body)
+				    return body.Energy < 35 and body.Energy > 25
+			    end,
+		    },
+		    {
+			    id = "Tired",
+			    displayName = "Устал",
+			    description = "Пора спатки...",
+			    condition = function(body)
+		    		return body.Energy < 25 and body.Energy > 15
+			    end,
+		    },
+		    {
+			    id = "Very Tired",
+			    displayName = "Очень устал",
+			    description = "Сейчас РЕАЛЬНО время поспать",
+			    condition = function(body)
+			    	return body.Energy < 15 and body.Energy >7
+			    end,
+		    },
+		    {
+			    id = "Hald-asleap",
+			    displayName = "В полусознании",
+			    description = "Едва засыпая, вот-вот рухнешь от усталости.",
+			    condition = function(body)
+				    return body.Energy < 7
+			    end,
+			},
+			{
+				id = "Sleep",
+				displayName = "Спит",
+				description = "Просто прилег вздремнуть...",
+				condition = function(body)
+					return body.Sleep == true
+				end,
+			},
+		}	
+	},
+}
+return MoodDefs
