@@ -1,5 +1,6 @@
 local DEBUG = true
-
+local QUIET_MODE = true
+local DEBUG2 = false
 
 
 local RunService = game:GetService("RunService")
@@ -49,9 +50,18 @@ BodyService.ObservedStats = {
 	Hunger = 0.01,
 	Thirst = 0.01,
 	Energy = 0.01,
+	Oxygen = 0.01,
+	OxygenBlocked = 0,
+	Energized = 0,
+	Caffeination = 0.01,
+	Stamina = 0.01,
+	Muscle = 0.01,
+	Skin = 0.01,
+	Infection = 0.01,
 	Immunity = 0.01,
 	Temperature = 0.01,
-	HasAntibiotics = 0
+	HasAntibiotics = 0,
+	Consciousness = 0.01
 }
 
 -- ==============================
@@ -201,14 +211,124 @@ function BodyService:UpdateGlobalStates(body)
 end
 
 -- ==============================
--- UPDATE BODY
+-- UPDATE VITALS
 -- ==============================
 
 local logTimer = 0 -- для логирования раз в секунду
 
 function BodyService:UpdateVitals(body, dt)
 	
+	-- =====================
+	-- ENERGY
+	-- =====================
 
+	local baseDrain = 0.07 -- базовое падение в секунду
+	local multiplier = 1
+
+	-- усталость
+	if body.Stamina and body.Stamina < 5 then
+		multiplier *= 3.5
+	end
+
+	-- бодрость
+	if body.Caffeination and body.Caffeination > 0 then
+		multiplier *= 0.55
+	end
+
+	if body.Sleep then
+		-- реген энергии во сне
+		local sleepRegenPerSecond = 0.9
+
+		body.Energy = math.clamp(
+			body.Energy + sleepRegenPerSecond * dt,
+			0,
+			100
+		)
+	else
+		body.Energy = math.clamp(
+			body.Energy - (baseDrain * multiplier) * dt,
+			0,
+			100
+		)
+	end
+	
+	-- =====================
+	-- ENERGY → CONSCIOUSNESS
+	-- =====================
+
+	if body.Energy < 25 then
+
+		local drainRate = 0.5 -- базовое падение в секунду
+
+		if body.Energy < 15 then
+			drainRate = 1.2
+		end
+
+		if body.Energy < 5 then
+			drainRate = 3.5
+		end
+
+		body.Consciousness = math.clamp(
+			body.Consciousness - drainRate * dt,
+			0,
+			body.Brain
+		)
+
+	else
+		-- лёгкое восстановление сознания если энергии достаточно
+		body.Consciousness = math.clamp(
+			body.Consciousness + 3.5 * dt,
+			0,
+			body.Brain
+		)
+	end
+	
+	-- =====================
+	-- STAMINA REGEN
+	-- =====================
+
+	local staminaRegenPerSecond = 2.5 -- скорость регенерации стамины
+	local energyMultiplier = 1
+
+	if body.Energy < 25 then
+		energyMultiplier = 0.6
+	end
+
+	if body.Energy < 15 then
+		energyMultiplier = 0.35
+	end
+
+	if body.Energy < 5 then
+		energyMultiplier = 0.1
+	end
+
+	if body.Stamina < body.MaxStamina then
+		body.Stamina = math.clamp(
+			body.Stamina + (staminaRegenPerSecond * energyMultiplier) * dt,
+			0,
+			body.MaxStamina
+		)
+	end
+	
+	-- =====================
+	-- CAFFEINATION
+	-- =====================
+
+	local caffeineDrainPerSecond = 1 / 12
+
+	-- уменьшаем уровень
+	body.Caffeination = math.clamp(
+		body.Caffeination - caffeineDrainPerSecond * dt,
+		Config.Global.MIN_CAFFEINATION,
+		Config.Global.MAX_CAFFEINATION
+	)
+
+	-- обновляем состояние Energized
+	if body.Caffeination > 0 then
+		body.Energized = true
+	else
+		body.Energized = false
+	end
 
 	-- =====================
 	-- HUNGER
@@ -276,22 +396,21 @@ function BodyService:UpdateBody(body, dt)
 		body.NeedsMoodUpdate = false
 		MoodService:Evaluate(body.Player, body)
 	end
-
+	
 	-- ==== DEBUG LOG (1 РАЗ В СЕКУНДУ) ====
 	if DEBUG then
 		logTimer += dt
 		if logTimer >= 1 then
 			logTimer = 0
+			print(self:CheckObservedStats(body))
 			print("Body:",body)
 			print(string.format(
-				"H: %.1f | T: %.1f | E: %.1f | I: %.1f | HS: %.1f | CS: %.1f | CM: %.1f",
+				"H: %.1f | T: %.1f | E: %.1f | I: %.1f | C: %.1f",
 				body.Hunger,
 				body.Thirst,
 				body.Energy,
 				body.Immunity,
-				body.Parts.Head.Skin,
-				body.Parts.Chest.Skin,
-				body.Parts.Chest.Muscle
+				body.Consciousness
 				))
 		end
 	end
@@ -314,7 +433,7 @@ function BodyService:CheckObservedStats(body)
 		else
 			local changed = false
 
-			if type(current) == "number" then
+			if DEBUG and type(current) == "number" then
 				if math.abs(current - last) > tolerance then
 					changed = true
 				end
@@ -323,13 +442,13 @@ function BodyService:CheckObservedStats(body)
 					changed = true
 				end
 			end
-			self:CheckObservedStats(body)
+			
 			if changed then
 				body._LastSnapshot[stat] = current
 				body.NeedsMoodUpdate = true
 
-				if DEBUG then
-					print("[OBSERVED DIRTY]", body.Player.Name, stat)
+				if not QUIET_MODE then
+					print("[OBSERVED CHANGES]", body.Player.Name, stat)
 				end
 			end
 		end
@@ -339,7 +458,7 @@ end
 
 
 -- ==============================
--- PLAYER HOOKS
+-- PLAYER
 -- ==============================
 
 Players.PlayerAdded:Connect(function(player)
