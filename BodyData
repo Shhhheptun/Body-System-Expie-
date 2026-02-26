@@ -13,7 +13,8 @@ function BodyData.new()
 	local G = Config.Global
 
 	-- ГЛОБАЛЬНЫЕ ПОКАЗАТЕЛИ
-	self.Brain = G.MAX_BRAIN
+	self.MaxBrain = G.MAX_BRAIN
+	self.Brain = G.BRAIN
 	self.MinBrain = G.MIN_BRAIN
 	self.Consciousness = G.MAX_BRAIN
 
@@ -34,6 +35,11 @@ function BodyData.new()
 	self.MinOxygen = G.MIN_OXYGEN
 	
 	self.OxygenBlocked = false -- удушье, под водой, и т.п
+	self.HasAntibiotics = false 
+	self.Energized = false
+	self.MaxCaffeination = G.MAX_CAFFEINATION
+	self.Caffeination = G.CAFFEINATION
+	self.MinCaffeination = G.MIN_CAFFEINATION
 	
 	self.MaxHunger = G.MAX_HUNGER
 	self.Hunger = G.HUNGER
@@ -51,7 +57,7 @@ function BodyData.new()
 	
 	self.Energy = G.ENERGY
 	self.MinEnergy = G.MIN_ENERGY
-	
+	self.MaxStamina = G.MAX_STAMINA
 	self.Stamina = G.STAMINA
 	self.MinStamina = G.MIN_STAMINA
 
@@ -60,6 +66,7 @@ function BodyData.new()
 		Unconscious = false,
 		Dead = false,
 		InShock = false,
+		Sleep = false,
 	}
 
 	-- ==============================
