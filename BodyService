@@ -281,6 +281,50 @@ end
 end
 
 -- ==============================
+-- ENVIRONMENT TEMPERATURE SYSTEM
+-- ==============================
+
+local ENV_MIN = -40
+local ENV_MAX = 90
+local ENV_NEUTRAL = 20
+
+local MAX_COLD_SHIFT = -10 -- тело может остыть до 26.6
+local MAX_HOT_SHIFT  = 8   -- тело может нагреться до 44.6
+
+local BODY_TEMP_ADAPT_RATE = 0.02 -- скорость адаптации
+
+local function smoothstep(t)
+	t = math.clamp(t, 0, 1)
+	return t * t * (3 - 2 * t)
+end
+
+local function EnvTempToPercent(Tenv)
+	if Tenv == ENV_NEUTRAL then
+		return 0
+	end
+
+	if Tenv > ENV_NEUTRAL then
+		local t = (Tenv - ENV_NEUTRAL) / (ENV_MAX - ENV_NEUTRAL)
+		t = math.clamp(t, 0, 1)
+		return smoothstep(t) * 100
+	else
+		local t = (ENV_NEUTRAL - Tenv) / (ENV_NEUTRAL - ENV_MIN)
+		t = math.clamp(t, 0, 1)
+		return -smoothstep(t) * 100
+	end
+end
+
+local function PercentToTargetBodyTemp(percent)
+	local base = 36.6
+
+	if percent >= 0 then
+		return base + (percent/100) * MAX_HOT_SHIFT
+	else
+		return base + (percent/100) * math.abs(MAX_COLD_SHIFT)
+	end
+end
+
+-- ==============================
 -- UPDATE VITALS
 -- ==============================
 
@@ -405,6 +449,18 @@ function BodyService:UpdateVitals(body, dt)
 		0,
 		100
 	)
+	
+	-- =====================
+	-- ENVIRONMENT TEMPERATURE UPDATE
+	-- =====================
+
+	local envPercent = EnvTempToPercent(body.EnvironmentTemperature)
+	body.EnvironmentPercent = envPercent -- для дебага
+
+	local targetTemp = PercentToTargetBodyTemp(envPercent)
+
+	body.Temperature = body.Temperature + 
+		(targetTemp - body.Temperature) * BODY_TEMP_ADAPT_RATE * dt
 end
 
 function BodyService:UpdateBody(body, dt)
