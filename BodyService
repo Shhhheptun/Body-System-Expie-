@@ -91,6 +91,51 @@ function BodyService:RemoveBodyForPlayer(player)
 end
 
 -- ==============================
+-- RESOLVE CONSCIOUSNESS
+-- ==============================
+function BodyService:ResolveConsciousness(body)
+
+	local brainFactor = body.Brain / body.MaxBrain
+	brainFactor = math.clamp(brainFactor, 0, 1)
+
+	-- ENERGY
+	local energyThreshold = 35
+	local energyFactor = 1
+
+	if body.Energy < energyThreshold then
+		energyFactor = body.Energy / energyThreshold
+	end
+
+	energyFactor = math.clamp(energyFactor, 0, 1)
+
+	-- OXYGEN
+	local oxygenFactor = body.Oxygen / 100
+	oxygenFactor = math.clamp(oxygenFactor, 0, 1)
+
+	
+
+	-- BLOOD (пример — если меньше 40% крови)
+	local bloodPercent = body.Blood / body.MaxBlood
+	local bloodFactor = math.clamp(bloodPercent, 0, 1)
+
+	-- ИТОГ
+	local final =
+		body.MaxBrain
+		* brainFactor
+		* energyFactor
+		* oxygenFactor
+		* bloodFactor
+	print(
+		brainFactor,
+		energyFactor,
+		oxygenFactor,
+		bloodFactor
+	)
+
+	body.Consciousness = math.clamp(final, 0, body.Brain)
+end
+
+-- ==============================
 -- IMMUNITY
 -- ==============================
 
@@ -145,7 +190,7 @@ end
 -- REGEN
 -- ==============================
 
-function BodyService:UpdateLimbRegen(limb, dt)
+function BodyService:UpdateLimbRegen(body, limb, dt)
 
 	local skinRegenRate = 0.1
 	local muscleRegenRate = 0.075
@@ -167,10 +212,16 @@ function BodyService:UpdateLimbRegen(limb, dt)
 
 	-- МЫШЦЫ
 	if limb.Muscle < Config.Global.MAX_MUSCLE then
+
 		local finalMuscleRate = muscleRegenRate
 
 		if limb.Muscle < 10 then
 			finalMuscleRate *= 0.1
+		end
+
+		-- Ускорение если это голова и Concussed
+		if limb == body.Parts.Head and body.States.Concussed then
+			finalMuscleRate *= 10
 		end
 
 		limb.Muscle = math.clamp(
@@ -190,6 +241,18 @@ local function clamp(value, min, max)
 end
 
 function BodyService:UpdateGlobalStates(body)
+	
+-- =====================
+-- CONCUSSED
+-- =====================
+
+local headMuscle = body.Parts.Head.Muscle
+
+if headMuscle < 14.4 then
+    body.States.Concussed = true
+else
+    body.States.Concussed = false
+end
 
 	if body.Brain <= 0 then
 		body.States.Dead = true
@@ -203,8 +266,15 @@ function BodyService:UpdateGlobalStates(body)
 		body.Brain
 	)
 
-	if body.Consciousness <= 0 then
+	-- =====================
+	-- UNCONSCIOUS
+	-- =====================
+
+	if body.Consciousness < 10 and 
+		(not body.States.Sleep or body.States.Concussed) then
+
 		body.States.Unconscious = true
+
 	elseif body.Consciousness >= 10 then
 		body.States.Unconscious = false
 	end
@@ -235,7 +305,7 @@ function BodyService:UpdateVitals(body, dt)
 		multiplier *= 0.55
 	end
 
-	if body.Sleep then
+	if body.States.Sleep then
 		-- реген энергии во сне
 		local sleepRegenPerSecond = 0.9
 
@@ -253,35 +323,10 @@ function BodyService:UpdateVitals(body, dt)
 	end
 	
 	-- =====================
-	-- ENERGY → CONSCIOUSNESS
+	-- ENERGY → CONSCIOUSNESS 
 	-- =====================
-
-	if body.Energy < 25 then
-
-		local drainRate = 0.5 -- базовое падение в секунду
-
-		if body.Energy < 15 then
-			drainRate = 1.2
-		end
-
-		if body.Energy < 5 then
-			drainRate = 3.5
-		end
-
-		body.Consciousness = math.clamp(
-			body.Consciousness - drainRate * dt,
-			0,
-			body.Brain
-		)
-
-	else
-		-- лёгкое восстановление сознания если энергии достаточно
-		body.Consciousness = math.clamp(
-			body.Consciousness + 3.5 * dt,
-			0,
-			body.Brain
-		)
-	end
+	
+	self:ResolveConsciousness(body)
 	
 	-- =====================
 	-- STAMINA REGEN
@@ -386,7 +431,7 @@ function BodyService:UpdateBody(body, dt)
 
 	-- ==== LIMBS ====
 	for _, limb in pairs(body.Parts) do
-		self:UpdateLimbRegen(limb, dt)
+		self:UpdateLimbRegen(body, limb, dt)
 	end
 
 	-- ==== GLOBAL STATES ====
