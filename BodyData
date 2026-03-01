@@ -17,12 +17,22 @@ function BodyData.new()
 	self.Brain = G.BRAIN
 	self.MinBrain = G.MIN_BRAIN
 	self.Consciousness = G.MAX_BRAIN
+	
+	self.HearingLoss = G.HEARING_LOSS
+	self.MaxHearingLoss = G.MAX_HEARING_LOSS
+	self.MinHearingLoss = G.MIN_HEARING_LOSS
 
 	self.Pain = G.PAIN
 	self.MaxPain = G.MAX_PAIN
+	self.MinPain = G.MIN_PAIN
+	
+	self.Shock = G.SHOCK
+	self.MaxShock = G.MAX_SHOCK
+	self.MinShock = G.MIN_SHOCK
 
 	self.Blood = G.BLOOD
 	self.MaxBlood = G.MAX_BLOOD
+	self.MinBlood = G.MIN_BLOOD
 	
 	self.AllBleeds = G.ALL_BLEEDS
 	self.MaxAllBleeds = G.MAX_ALL_BLEEDS
@@ -30,7 +40,8 @@ function BodyData.new()
 	self.HeartRate = 80
 	self.Adrenaline = G.ADRENALINE
 	self.MaxAdrenaline = G.MAX_ADRENALINE
- 	
+	
+	self.MaxOxygen = G.MAX_OXYGEN
 	self.Oxygen = G.OXYGEN
 	self.MinOxygen = G.MIN_OXYGEN
 	
@@ -51,9 +62,21 @@ function BodyData.new()
 	
 	self.Temperature = 36.6
 	
+	-- Температура окружения
+	self.EnvironmentTemperature = 20 -- нейтральная
+	self.EnvironmentPercent = 0      -- -100..100 для дебага
+	
+	self.SepticSchock = G.SEPTIC_SHOCK
+	
 	self.MaxThirst = G.MAX_THIRST
 	self.Thirst = G.THIRST
 	self.MinThirst = G.MIN_THIRST
+	
+	self.MaxWetness = G.MAX_WETNESS
+	self.Wetness = G.WETNESS
+	self.MinWetness = G.MIN_WETNESS
+	
+	self.MaxEnergy = G.MAX_ENERGY
 	
 	self.Energy = G.ENERGY
 	self.MinEnergy = G.MIN_ENERGY
@@ -65,8 +88,8 @@ function BodyData.new()
 	self.States = {
 		Unconscious = false,
 		Dead = false,
-		InShock = false,
 		Sleep = false,
+		Concussed = false,
 	}
 
 	-- ==============================
