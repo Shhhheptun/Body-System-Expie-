@@ -48,6 +48,9 @@ function BodyData.new()
 	self.OxygenBlocked = false -- удушье, под водой, и т.п
 	self.HasAntibiotics = false 
 	self.Energized = false
+	self.NonePainK_Overdose = false
+	self.LastStand = false
+	
 	self.MaxCaffeination = G.MAX_CAFFEINATION
 	self.Caffeination = G.CAFFEINATION
 	self.MinCaffeination = G.MIN_CAFFEINATION
@@ -83,6 +86,22 @@ function BodyData.new()
 	self.MaxStamina = G.MAX_STAMINA
 	self.Stamina = G.STAMINA
 	self.MinStamina = G.MIN_STAMINA
+	
+	self.MinStimulated = G.MIN_STIMULATED
+	self.Stimulated = G.STIMULATED
+	self.MaxStimulated = G.MAX_STIMULATED
+	
+	self.MinPainKillers = G.MIN_PAIN_KILLERS
+	self.PainKillers = G.PAIN_KILLERS
+	self.MaxPainKillers = G.MAX_PAIN_KILLERS
+	
+	self.MinHemothorax = G.MIN_HEMOTHORAX
+	self.Hemothorax = G.HEMOTHORAX
+	self.MaxHemothorax = G.MAX_HEMOTHORAX
+	
+	self.InternalBleeding = G.INTERNAL_BLEEDING
+	self.MaxInternalBleeding = G.MAX_INTERNAL_BLEEDING
+	self.MinInternalBleeding = G.MIN_INTERNAL_BLEEDING
 
 	-- ОБЩЕЕ СОСТОЯНИЯ
 	self.States = {
