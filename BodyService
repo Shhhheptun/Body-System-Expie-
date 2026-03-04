@@ -113,10 +113,28 @@ function BodyService:ResolveConsciousness(body)
 	oxygenFactor = math.clamp(oxygenFactor, 0, 1)
 
 	
+	-- Blood factor с порогами и S-кривой
+	local function GetBloodFactor(blood, maxBlood)
+		local bp = blood / maxBlood
+		bp = math.clamp(bp, 0, 1)
 
-	-- BLOOD (пример — если меньше 40% крови)
-	local bloodPercent = body.Blood / body.MaxBlood
-	local bloodFactor = math.clamp(bloodPercent, 0, 1)
+		local safeThreshold = 0.65
+		local criticalThreshold = 0.35
+
+		if bp >= safeThreshold then
+			return 1
+		end
+
+		if bp <= criticalThreshold then
+			local r = bp / criticalThreshold
+			return r * r
+		end
+
+		local t = (bp - criticalThreshold) / (safeThreshold - criticalThreshold)
+		return t * t * (3 - 2 * t)
+	end
+
+	local bloodFactor = GetBloodFactor(body.Blood, body.MaxBlood)
 
 	-- ИТОГ
 	local final =
@@ -291,7 +309,7 @@ local ENV_NEUTRAL = 20
 local MAX_COLD_SHIFT = -10 -- тело может остыть до 26.6
 local MAX_HOT_SHIFT  = 8   -- тело может нагреться до 44.6
 
-local BODY_TEMP_ADAPT_RATE = 0.02 -- скорость адаптации
+local BODY_TEMP_ADAPT_RATE = 0.05 -- скорость адаптации
 
 local function smoothstep(t)
 	t = math.clamp(t, 0, 1)
@@ -508,7 +526,7 @@ function BodyService:UpdateBody(body, dt)
 			print(string.format(
 				"H: %.1f | T: %.1f | E: %.1f | I: %.1f | C: %.1f",
 				body.Hunger,
-				body.Thirst,
+				body.Temperature,
 				body.Energy,
 				body.Immunity,
 				body.Consciousness
