@@ -4,37 +4,28 @@ local Config = require(script.Parent.Parent:WaitForChild("Expie_Config"))
 
 local ConsciousnessSystem = {}
 
--- Порог, от которого начинается снижение сознания
-local ENERGY_THRESHOLD = 35
+function ConsciousnessSystem.Update(body, dt)
 
--- Дополнительные факторы
-local TEMP_MIN_EFFECT = 28
+	-- естественное восстановление
+	body.Consciousness += 3 * dt
 
-function ConsciousnessSystem:Update(body)
+	-- лимиты
+	local cap = 100
 
-	-- BASE: вычислённое «сырое» сознание до капов
-	local base = body.Brain
+	cap = math.min(cap, body.Oxygen)
+	cap = math.min(cap, body.Parts.Head.Muscle)
+	cap = math.min(cap, body.Energy)
 
-	-- ENERGY EFFECT (линейная зависимость)
-	local energyRatio = math.clamp(body.Energy / ENERGY_THRESHOLD, 0, 1)
-	base *= energyRatio
+	body.Consciousness = math.clamp(body.Consciousness, 0, cap)
 
-	-- TEMPERATURE EFFECT (если слишком холодно)
-	if body.Temperature < TEMP_MIN_EFFECT then
-		local diff = (TEMP_MIN_EFFECT - body.Temperature) / (TEMP_MIN_EFFECT)
-		base -= diff * body.MaxBrain * 0.04
+	-- состояния
+	if body.Consciousness < 20 then
+		body.IsUnconscious = true
+	else
+		body.IsUnconscious = false
 	end
 
-	-- OXYGEN EFFECT
-	local oxyRatio = body.Oxygen / Config.Global.MAX_OXYGEN
-	base *= math.clamp(oxyRatio, 0, 1)
-
-	-- BLOOD FACTOR
-	local bloodRatio = body.Blood / body.MaxBlood
-	base *= math.clamp(bloodRatio, 0, 1)
-
-	-- Накладываем cap по мозгу
-	base = math.clamp(base, 0, body.Brain)
-
-	body.Consciousness = base
 end
+
+return ConsciousnessSystem
+
