@@ -10,25 +10,24 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
 -- SERVER SIDE SYSTEM
-local BodySystem = ServerScriptService:WaitForChild("BodySystem")
-local MoodService = require(BodySystem:WaitForChild("MoodService"))
+local ServerBodySystem = ServerScriptService:WaitForChild("BodySystem")
+local MoodService = require(ServerBodySystem:WaitForChild("MoodService"))
 
 -- SHARED MODULES
-local bodySystem = ReplicatedStorage:WaitForChild("BodySystem")
-local Config = require(bodySystem:WaitForChild("Expie_Config"))
-local BodyData = require(bodySystem:WaitForChild("BodyData"))
-
+local StorageBodySystem = ReplicatedStorage:WaitForChild("BodySystem")
+local Config = require(StorageBodySystem:WaitForChild("Expie_Config"))
+local BodyData = require(StorageBodySystem:WaitForChild("BodyData"))
 
 
 -- ==============================
 -- BODY STATE FOLDER
 -- ==============================
 
-local bodyStateFolder = bodySystem:FindFirstChild("BodyState")
+local bodyStateFolder = StorageBodySystem:FindFirstChild("BodyState")
 if not bodyStateFolder then
 	bodyStateFolder = Instance.new("Folder")
 	bodyStateFolder.Name = "BodyState"
-	bodyStateFolder.Parent = bodySystem
+	bodyStateFolder.Parent = StorageBodySystem
 end
 
 Players.PlayerAdded:Connect(function(player)
