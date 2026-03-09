@@ -1,3 +1,7 @@
+-- BodyService
+-- ServerScriptService.BodySystem.BodyService
+-- Логика тела игрока
+
 local DEBUG = true
 local QUIET_MODE = true
 local DEBUG2 = false
@@ -10,13 +14,38 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
 -- SERVER SIDE SYSTEM
-local BodySystem = ServerScriptService:WaitForChild("BodySystem")
-local MoodService = require(BodySystem:WaitForChild("MoodService"))
+local ServerBodySystem = ServerScriptService:WaitForChild("BodySystem")
+local MoodService = require(ServerBodySystem:WaitForChild("MoodService"))
 
 -- SHARED MODULES
-local bodySystem = ReplicatedStorage:WaitForChild("BodySystem")
-local Config = require(bodySystem:WaitForChild("Expie_Config"))
-local BodyData = require(bodySystem:WaitForChild("BodyData"))
+local StorageBodySystem = ReplicatedStorage:WaitForChild("BodySystem")
+local Config = require(StorageBodySystem:WaitForChild("Expie_Config"))
+local BodyData = require(StorageBodySystem:WaitForChild("BodyData"))
+
+-- SYSTEMS
+local Systems = ServerBodySystem.Systems
+
+
+
+-- AUTO LOAD SYSTEMS
+
+local LoadedSystems = {}
+
+for _, module in ipairs(Systems:GetChildren()) do
+
+	if module:IsA("ModuleScript") then
+
+		local system = require(module)
+		table.insert(LoadedSystems, system)
+
+		if DEBUG then
+			print("[BodyService] Loaded system:", module.Name)
+		end
+
+	end
+
+end
+
 
 
 
@@ -24,11 +53,11 @@ local BodyData = require(bodySystem:WaitForChild("BodyData"))
 -- BODY STATE FOLDER
 -- ==============================
 
-local bodyStateFolder = bodySystem:FindFirstChild("BodyState")
+local bodyStateFolder = StorageBodySystem:FindFirstChild("BodyState")
 if not bodyStateFolder then
 	bodyStateFolder = Instance.new("Folder")
 	bodyStateFolder.Name = "BodyState"
-	bodyStateFolder.Parent = bodySystem
+	bodyStateFolder.Parent = StorageBodySystem
 end
 
 Players.PlayerAdded:Connect(function(player)
@@ -77,6 +106,7 @@ function BodyService:CreateBodyForPlayer(player)
 
 	local body = BodyData.new()
 	body.Player = player
+	body._Delta = {}
 	body.NeedsMoodUpdate = false
 	self.Bodies[player] = body
 
@@ -90,67 +120,22 @@ function BodyService:RemoveBodyForPlayer(player)
 	print("[BodyService] Body removed for", player.Name)
 end
 
--- ==============================
--- RESOLVE CONSCIOUSNESS
--- ==============================
-function BodyService:ResolveConsciousness(body)
+local function ApplyDelta(body)
 
-	local brainFactor = body.Brain / body.MaxBrain
-	brainFactor = math.clamp(brainFactor, 0, 1)
+	for stat, delta in pairs(body._Delta) do
 
-	-- ENERGY
-	local energyThreshold = 35
-	local energyFactor = 1
+		body[stat] = (body[stat] or 0) + delta
 
-	if body.Energy < energyThreshold then
-		energyFactor = body.Energy / energyThreshold
 	end
 
-	energyFactor = math.clamp(energyFactor, 0, 1)
+	table.clear(body._Delta)
 
-	-- OXYGEN
-	local oxygenFactor = body.Oxygen / 100
-	oxygenFactor = math.clamp(oxygenFactor, 0, 1)
+end
 
-	
-	-- Blood factor с порогами и S-кривой
-	local function GetBloodFactor(blood, maxBlood)
-		local bp = blood / maxBlood
-		bp = math.clamp(bp, 0, 1)
+local function AddDelta(body, stat, value)
 
-		local safeThreshold = 0.65
-		local criticalThreshold = 0.35
+	body._Delta[stat] = (body._Delta[stat] or 0) + value
 
-		if bp >= safeThreshold then
-			return 1
-		end
-
-		if bp <= criticalThreshold then
-			local r = bp / criticalThreshold
-			return r * r
-		end
-
-		local t = (bp - criticalThreshold) / (safeThreshold - criticalThreshold)
-		return t * t * (3 - 2 * t)
-	end
-
-	local bloodFactor = GetBloodFactor(body.Blood, body.MaxBlood)
-
-	-- ИТОГ
-	local final =
-		body.MaxBrain
-		* brainFactor
-		* energyFactor
-		* oxygenFactor
-		* bloodFactor
-	print(
-		brainFactor,
-		energyFactor,
-		oxygenFactor,
-		bloodFactor
-	)
-
-	body.Consciousness = math.clamp(final, 0, body.Brain)
 end
 
 -- ==============================
@@ -388,7 +373,13 @@ function BodyService:UpdateVitals(body, dt)
 	-- ENERGY → CONSCIOUSNESS 
 	-- =====================
 	
-	self:ResolveConsciousness(body)
+	for _, system in ipairs(LoadedSystems) do
+
+		if system.Update then
+			system.Update(body, dt)
+		end
+
+	end
 	
 	-- =====================
 	-- STAMINA REGEN
@@ -526,11 +517,12 @@ function BodyService:UpdateBody(body, dt)
 			print(string.format(
 				"H: %.1f | T: %.1f | E: %.1f | I: %.1f | C: %.1f",
 				body.Hunger,
-				body.Temperature,
+				body.Thirst,
 				body.Energy,
 				body.Immunity,
 				body.Consciousness
 				))
+			return
 		end
 	end
 end
