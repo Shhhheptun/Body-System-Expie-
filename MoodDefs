@@ -1,3 +1,7 @@
+-- MoodDefs
+-- ReplicatedStorage.BodySystem.MoodDefs
+-- Просто хранилище мудов, можно пополнять и пополнять до бесконечности
+
 local MoodDefs = {
 	
 	
