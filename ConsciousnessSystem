@@ -1,31 +1,63 @@
+-- ConsciousnessSystem
 -- ReplicatedStorage/BodySystem/Systems/ConsciousnessSystem
-
-local Config = require(script.Parent.Parent:WaitForChild("Expie_Config"))
+-- ну... странно что оно аще тут сидит, хотя по факту он должен быть частью бади сервиса, разве не?
 
 local ConsciousnessSystem = {}
 
+local function GetBloodFactor(blood, maxBlood)
+
+	local bp = blood / maxBlood
+	bp = math.clamp(bp, 0, 1)
+
+	local safeThreshold = 0.65
+	local criticalThreshold = 0.35
+
+	if bp >= safeThreshold then
+		return 1
+	end
+
+	if bp <= criticalThreshold then
+		local r = bp / criticalThreshold
+		return r * r
+	end
+
+	local t = (bp - criticalThreshold) / (safeThreshold - criticalThreshold)
+	return t * t * (3 - 2 * t)
+
+end
+
+
 function ConsciousnessSystem.Update(body, dt)
 
-	-- естественное восстановление
-	body.Consciousness += 3 * dt
+	local brainFactor = body.Brain / body.MaxBrain
+	brainFactor = math.clamp(brainFactor, 0, 1)
 
-	-- лимиты
-	local cap = 100
+	-- ENERGY
+	local energyThreshold = 35
+	local energyFactor = 1
 
-	cap = math.min(cap, body.Oxygen)
-	cap = math.min(cap, body.Parts.Head.Muscle)
-	cap = math.min(cap, body.Energy)
-
-	body.Consciousness = math.clamp(body.Consciousness, 0, cap)
-
-	-- состояния
-	if body.Consciousness < 20 then
-		body.IsUnconscious = true
-	else
-		body.IsUnconscious = false
+	if body.Energy < energyThreshold then
+		energyFactor = body.Energy / energyThreshold
 	end
+
+	energyFactor = math.clamp(energyFactor, 0, 1)
+
+	-- OXYGEN
+	local oxygenFactor = body.Oxygen / body.MaxOxygen
+	oxygenFactor = math.clamp(oxygenFactor, 0, 1)
+
+	-- BLOOD
+	local bloodFactor = GetBloodFactor(body.Blood, body.MaxBlood)
+
+	local final =
+		body.MaxBrain
+		* brainFactor
+		* energyFactor
+		* oxygenFactor
+		* bloodFactor
+
+	body.Consciousness = math.clamp(final, 0, body.Brain)
 
 end
 
 return ConsciousnessSystem
-
