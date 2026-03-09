@@ -1,3 +1,7 @@
+-- Expie_Config
+-- ReplicatedStorage.BodySystem.Expie_Config
+-- Конфигурации тела игрока
+
 local Config = {}
 
 -- ==============================
