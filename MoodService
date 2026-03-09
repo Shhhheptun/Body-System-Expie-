@@ -1,3 +1,7 @@
+-- MoodService
+-- Server.BodySystem.MoodService
+-- Логика вычисления мудов
+
 local DEBUG = false
 local function debugLog(...)
 	if not DEBUG then return end
