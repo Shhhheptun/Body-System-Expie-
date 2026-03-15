@@ -73,7 +73,13 @@ function BodyData.new()
 	self.EnvironmentTemperature = 20 -- нейтральная
 	self.EnvironmentPercent = 0      -- -100..100 для дебага
 	
-	self.SepticSchock = G.SEPTIC_SHOCK
+	self.Sepsis = G.SEPTIC_SHOCK
+	self.MinSepsis = G.MIN_SEPTIC_SHOCK
+	self.MaxSepsis = G.MAX_SEPTIC_SHOCK
+	
+	self.MinInfection = G.MIN_INFECTION
+	self.MaxInfection = G.MAX_INFECTION
+	self.Infection = G.INFECTION
 	
 	self.MaxThirst = G.MAX_THIRST
 	self.Thirst = G.THIRST
