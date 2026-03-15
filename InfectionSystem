@@ -7,11 +7,12 @@ local InfectionSystem = {}
 local DEBUG = true
 local logTimer = 0
 
-InfectionSystem.Priority = 40
-
 -- СЕПСИС
 local BASE_SEPSIS_RATE = 0.0277
 local SEPSIS_DECAY = 0.07
+
+-- время между распространениями инфекции
+local SPREAD_INTERVAL = 30
 
 -- соединение конечностей
 local LimbGraph = {
@@ -35,45 +36,24 @@ local LimbGraph = {
 	RightShin = {"RightThigh"}
 }
 
--- приоритет заражения
-local Priority = {
-
-	Head = 5,
-	Chest = 4,
-	Stomach = 3,
-
-	LeftShoulder = 2,
-	RightShoulder = 2,
-
-	LeftForearm = 1,
-	RightForearm = 1,
-
-	LeftThigh = 1,
-	RightThigh = 1,
-
-	LeftShin = 0,
-	RightShin = 0
-}
-
--- Clamp
+-- clamp
 local function clamp(v,min,max)
 	return math.max(min,math.min(max,v))
 end
 
--- расчет growth rate от иммунитета
+-- growth rate от иммунитета
 local function GetGrowthRate(immunity)
 
 	-- 0 → 0.50
 	-- 100 → 0.15
 	-- 200 → -0.05
 
-	return 0.50 - 0.0035 * immunity
+	return 5 - 0.0035 * immunity
 
 end
 
-
--- выбор цели заражения
-local function ChooseTarget(limb, body)
+-- случайная соседняя конечность
+local function ChooseRandomNeighbor(limb, body)
 
 	local neighbors = LimbGraph[limb]
 	if not neighbors then return nil end
@@ -94,34 +74,13 @@ local function ChooseTarget(limb, body)
 		return nil
 	end
 
-	local best = {}
-	local bestPriority = -math.huge
-
-	for _,n in ipairs(candidates) do
-
-		local p = Priority[n] or 0
-
-		if p > bestPriority then
-
-			best = {n}
-			bestPriority = p
-
-		elseif p == bestPriority then
-
-			table.insert(best,n)
-
-		end
-
-	end
-
-	return best[math.random(#best)]
+	return candidates[math.random(#candidates)]
 
 end
 
 local function DebugPrint(body, growthRate, sepsisRate)
 
 	print("╔════════════ INFECTION DEBUG ════════════╗")
-
 	print(string.format(
 		"Sepsis: %.2f | SepsisRate: %.4f | GrowthRate: %.4f | Immunity: %.1f",
 		body.Sepsis or 0,
@@ -135,7 +94,7 @@ local function DebugPrint(body, growthRate, sepsisRate)
 	for limb, part in pairs(body.Parts) do
 
 		print(string.format(
-			"%-14s : I-%6.2f | S-%1f",
+			"%-14s : I-%6.2f | S-%6.2f",
 			limb,
 			part.Infection,
 			part.Skin
@@ -160,35 +119,68 @@ function InfectionSystem.Update(body, dt)
 
 		local infection = part.Infection
 
-		-- рост инфекции если кожа повреждена
-		if part.Skin < 85 then
-
-			infection += growthRate * dt
-
+		-- появление инфекции (если есть рана)
+		if infection == 0 and part.Skin < 85 then
+			infection = 0.1
 		end
 
-		infection = clamp(infection,0,100)
+		-- развитие инфекции
+		if infection > 0 then
+			infection += growthRate * dt
+		end
 
-		part.Infection = infection
+		part.Infection = clamp(infection,0,100)
 
-		totalInfection += infection
+		totalInfection += part.Infection
 
+	end
 
-		-- распространение инфекции
-		if infection >= 100 then
+	-- ТАЙМЕР РАСПРОСТРАНЕНИЯ
+	body.InfectionSpreadTimer = (body.InfectionSpreadTimer or 0) + dt
 
-			local target = ChooseTarget(limb, body)
+	if body.InfectionSpreadTimer >= SPREAD_INTERVAL then
 
-			if target then
+		body.InfectionSpreadTimer = 0
 
-				body.Parts[target].Infection = 1
+		local infectedLimbs = {}
+
+		for limb, part in pairs(body.Parts) do
+
+			if part.Infection >= 100 then
+
+				local neighbors = LimbGraph[limb]
+
+				if neighbors then
+
+					for _,n in ipairs(neighbors) do
+
+						local neighborPart = body.Parts[n]
+
+						if neighborPart and neighborPart.Infection == 0 then
+							table.insert(infectedLimbs, limb)
+							break
+						end
+
+					end
+
+				end
 
 			end
 
 		end
 
-	end
+		if #infectedLimbs > 0 then
 
+			local source = infectedLimbs[math.random(#infectedLimbs)]
+			local target = ChooseRandomNeighbor(source, body)
+
+			if target then
+				body.Parts[target].Infection = 1
+			end
+
+		end
+
+	end
 
 	-- СЕПСИС
 	body.Sepsis = body.Sepsis or 0
@@ -211,8 +203,7 @@ function InfectionSystem.Update(body, dt)
 
 	body.Sepsis = clamp(body.Sepsis,0,100)
 
-
-	-- DEBUG PRINT
+	-- DEBUG
 	if DEBUG then
 
 		logTimer += dt
@@ -223,7 +214,7 @@ function InfectionSystem.Update(body, dt)
 		end
 
 	end
-	
-end	
+
+end
 
 return InfectionSystem
