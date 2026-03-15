@@ -1,0 +1,5 @@
+local HitboxService = {}
+
+HitboxService.Hitboxes = {}
+
+return HitboxService
