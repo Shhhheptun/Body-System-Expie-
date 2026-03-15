@@ -1,6 +1,6 @@
 -- ConsciousnessSystem
 -- ReplicatedStorage/BodySystem/Systems/ConsciousnessSystem
--- ну... странно что оно аще тут сидит, хотя по факту он должен быть частью бади сервиса, разве не?
+-- Подсчет сознания по факторам
 
 local ConsciousnessSystem = {}
 
