@@ -1,0 +1,50 @@
+-- OxygenSystem
+-- ServerScriptService/BodySystem/Systems/OxygenSystem
+
+local OxygenSystem = {}
+
+local function clamp(v,min,max)
+	return math.max(min,math.min(max,v))
+end
+
+function OxygenSystem.Update(body, dt)
+
+	-- перенос кислорода кровью
+	local bloodPercent = body.Blood / body.MaxBlood
+
+	local transportFactor
+	if bloodPercent >= 0.7 then
+		transportFactor = 1
+	elseif bloodPercent <= 0.3 then
+		local t = bloodPercent / 0.3
+		transportFactor = t * t
+	else
+		local t = (bloodPercent - 0.3) / 0.4
+		transportFactor = t * t * (3 - 2 * t)
+	end
+
+	-- состояние лёгких
+	local lungFactor = 1 - (body.Hemothorax / body.MaxHemothorax)
+	lungFactor = clamp(lungFactor, 0, 1)
+
+	-- нет воздуха
+	if body.OxygenBlocked then
+		lungFactor = 0
+	end
+
+	-- ПРИТОК кислорода
+	local intake = 40 * lungFactor
+
+	-- ПОТРЕБЛЕНИЕ (можно потом усложнить)
+	local consumption = 20
+
+	-- итоговое изменение
+	local delta = (intake - consumption) * transportFactor
+
+	body.Oxygen += delta * dt
+
+	body.Oxygen = clamp(body.Oxygen, body.MinOxygen, body.MaxOxygen)
+
+end
+
+return OxygenSystem
