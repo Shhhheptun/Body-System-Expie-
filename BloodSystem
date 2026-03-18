@@ -1,0 +1,32 @@
+-- BloodSystem
+-- ServerScriptService/BodySystem/Systems/BloodSystem
+-- собирает кровотечения со всего тела
+
+local BloodSystem = {}
+
+local function clamp(v,min,max)
+	return math.max(min,math.min(max,v))
+end
+
+function BloodSystem.Update(body, dt)
+
+	local totalBleed = 0
+
+	-- собирает кровотечения с конечностей
+	for _, part in pairs(body.Parts) do
+		totalBleed += part.LimbBleed or 0
+	end
+
+	-- добавляет внутреннее кровотечение
+	totalBleed += body.InternalBleeding or 0
+
+	body.AllBleeds = totalBleed
+
+	-- уменьшает кровь
+	body.Blood -= totalBleed * dt
+
+	body.Blood = clamp(body.Blood, body.MinBlood, body.MaxBlood)
+
+end
+
+return BloodSystem
