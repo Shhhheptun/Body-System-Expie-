@@ -1,6 +1,5 @@
 -- BloodSystem
 -- ServerScriptService/BodySystem/Systems/BloodSystem
--- собирает кровотечения со всего тела
 
 local BloodSystem = {}
 
@@ -8,23 +7,38 @@ local function clamp(v,min,max)
 	return math.max(min,math.min(max,v))
 end
 
+-- веса частей тела
+local LimbWeights = {
+	Head = 1.5,
+	Chest = 1.3,
+	Stomach = 1.2,
+	LeftThigh = 1.0,
+	RightThigh = 1.0,
+	LeftShin = 0.7,
+	RightShin = 0.7,
+	LeftForearm = 0.5,
+	RightForearm = 0.5,
+	LeftShoulder = 0.6,
+	RightShoulder = 0.6,
+}
+
 function BloodSystem.Update(body, dt)
 
 	local totalBleed = 0
 
-	-- собирает кровотечения с конечностей
-	for _, part in pairs(body.Parts) do
-		totalBleed += part.LimbBleed or 0
+	for name, part in pairs(body.Parts) do
+		local bleed = part.LimbBleed or 0
+		local weight = LimbWeights[name] or 1
+		totalBleed += bleed * weight
 	end
 
-	-- добавляет внутреннее кровотечение
-	totalBleed += body.InternalBleeding or 0
+	-- внутреннее кровотечение (чуть опаснее)
+	totalBleed += (body.InternalBleeding or 0) * 1.2
 
 	body.AllBleeds = totalBleed
 
-	-- уменьшает кровь
+	-- уменьшение крови
 	body.Blood -= totalBleed * dt
-
 	body.Blood = clamp(body.Blood, body.MinBlood, body.MaxBlood)
 
 end
