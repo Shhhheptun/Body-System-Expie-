@@ -1,5 +1,5 @@
 -- Expie_Config
--- ReplicatedStorage.BodySystem.Expie_Config
+-- ReplicatedStorage/BodySystem/Expie_Config
 -- Конфигурации тела игрока
 
 local Config = {}
@@ -45,7 +45,7 @@ CAFFEINATION = 0,
 MIN_CAFFEINATION = 0,
 
 -- КОЛИЧЕСТВО КРОВИ
-MAX_BLOOD = 7500,
+MAX_BLOOD = 5870,
 BLOOD = 5000,
 MIN_BLOOD = 0,
 
