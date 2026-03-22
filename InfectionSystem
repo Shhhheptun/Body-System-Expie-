@@ -1,10 +1,10 @@
 -- InfectionSystem
--- ServerScriptService.BodySystem.Systems.InfectionSystem
+-- ServerScriptService/BodySystem/Systems/InfectionSystem
 -- Система развития и распространения инфекций
 
 local InfectionSystem = {}
 
-local DEBUG = true
+local DEBUG = false
 local logTimer = 0
 
 -- СЕПСИС
