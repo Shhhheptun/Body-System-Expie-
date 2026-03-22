@@ -1,20 +1,9 @@
-local DEBUG = false
+-- Если что это просто штука для тестов и типа тут может быть почти чо угодно
+local DEBUG = true
 local function debugLog(...)
 	if not DEBUG then return end
 	print(...)
 end
---
-for player, b in 
-	pairs(require(game.ServerScriptService.BodySystem.BodyService).Bodies) do
-	do print("SERVICE BODY", b) 
-
-	end
-
-end
-
-debugLog("TESTBODY LOADED")
-
-debugLog("Before require")
 
 local Players = game:GetService("Players")
 local BodyService = require(game.ServerScriptService.BodySystem.BodyService)
@@ -23,28 +12,31 @@ local MoodService = require(game.ServerScriptService.BodySystem.MoodService)
 debugLog("After require", BodyService)
 debugLog("CreateBody exists:", BodyService.CreateBody)
 
-local player = Players:GetPlayers()[1]
-
 -- ждём пока тело реально появится
+local player = Players.PlayerAdded:Wait()
+
 repeat task.wait() until BodyService.Bodies[player]
+
 
 local body = BodyService.Bodies[player]
 
-print("TEST USING BODY:", body)
+print("USING BODY:", body)
 
 task.wait(2)
 
-body.Hunger = 10
-MoodService:Evaluate(player, body)
+body.Hunger = 76
 
-task.wait(1)
+body.Thirst = 76
 
-body.Thirst = 10
-MoodService:Evaluate(player, body)
+body.Energy = 100
 
-task.wait(1)
+body.Temperature = 36.6
 
-body.Energy = 10
+body.Parts.Chest.LimbBleed = 75
+task.wait(25)
+
+body.Parts.Chest.LimbBleed = 0
+
 MoodService:Evaluate(player, body)
 
 local function printMood()
@@ -56,20 +48,7 @@ end
 debugLog("BodyService =", BodyService)
 debugLog("MoodService =", MoodService)
 
-task.wait(1)
-body.Hunger = 10
-MoodService:Evaluate(nil, body)
-print("HUNGER CHANGED TO", body.Hunger)
-print("BODY REF CHANGE", body)
 
-task.wait(1)
-body.Thirst = 10
-MoodService:Evaluate(nil, body)
-
-task.wait(1)
-body.Energy = 10
-MoodService:Evaluate(nil, body)
 
 debugLog("BodyServise:", BodyService)
 debugLog("CreateBody:", BodyService.CreateBody)
-
