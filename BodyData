@@ -1,5 +1,5 @@
 -- BodyData
--- ReplicatedStorage.BodySystem.BodyData
+-- ReplicatedStorage/BodySystem/BodyData
 -- Тело и состояния игрока
 
 local Config = require(script.Parent:WaitForChild("Expie_Config"))
@@ -35,6 +35,7 @@ function BodyData.new()
 	self.MinShock = G.MIN_SHOCK
 
 	self.Blood = G.BLOOD
+	self.NormalBlood = G.NORMAL_BLOOD
 	self.MaxBlood = G.MAX_BLOOD
 	self.MinBlood = G.MIN_BLOOD
 	
@@ -46,6 +47,7 @@ function BodyData.new()
 	self.MaxAdrenaline = G.MAX_ADRENALINE
 	
 	self.MaxOxygen = G.MAX_OXYGEN
+	self.MaxOxygenEffective = G.MAX_OXYGEN_EFFECTIVE
 	self.Oxygen = G.OXYGEN
 	self.MinOxygen = G.MIN_OXYGEN
 	
@@ -131,9 +133,9 @@ function BodyData.new()
 			Skin = G.SKIN,
 			Muscle = G.MUSCLE,
 			RegenTimer = 0,
-			LimbBleed = 0,
-			LimbPain = 0,
-			Infection = 0,
+			LimbBleed = G.LIMB_BLEED,
+			LimbPain = G.LIMB_PAIN,
+			Infection = G.INFECTION,
 			Fracture = false,
 			Dislocation = false,
 		}
@@ -145,9 +147,9 @@ function BodyData.new()
 		head.Muscle = G.MUSCLE
 		head.Fracture = false
 		head.Dislocation = false
-		head.LimbBleed = 0
-		head.LimbPain = 0
-		head.Infection = 0
+		head.LimbBleed = G.LIMB_BLEED
+		head.LimbPain = G.LIMB_PAIN
+		head.Infection = G.INFECTION
 		head.RegenTimer = 0
 
 		head.JawRipped = false
