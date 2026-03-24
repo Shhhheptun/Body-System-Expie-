@@ -1,5 +1,5 @@
 -- BodyService
--- ServerScriptService.BodySystem.BodyService
+-- ServerScriptService/BodySystem/BodyService
 -- Логика тела игрока
 
 local DEBUG = true
@@ -23,9 +23,8 @@ local Config = require(StorageBodySystem:WaitForChild("Expie_Config"))
 local BodyData = require(StorageBodySystem:WaitForChild("BodyData"))
 
 -- SYSTEMS
+
 local Systems = ServerBodySystem.Systems
-
-
 
 -- AUTO LOAD SYSTEMS
 
@@ -45,7 +44,6 @@ for _, module in ipairs(Systems:GetChildren()) do
 	end
 
 end
-
 
 
 
@@ -245,6 +243,14 @@ end
 
 function BodyService:UpdateGlobalStates(body)
 	
+	local safeBrain = math.max(body.Brain or 0, 0)
+
+	body.Consciousness = clamp(
+		body.Consciousness,
+		0,
+		safeBrain
+	)
+
 -- =====================
 -- CONCUSSED
 -- =====================
@@ -481,6 +487,9 @@ function BodyService:UpdateBody(body, dt)
 	
 	self:UpdateVitals(body, dt)
 	
+	-- FIX: Brain не уходит в минус
+	body.Brain = math.max(body.Brain or 0, 0)
+	
 	local oldImmunity = body.Immunity
 	local newImmunity = self:CalculateImmunityValue(body)
 
@@ -515,12 +524,13 @@ function BodyService:UpdateBody(body, dt)
 			print(self:CheckObservedStats(body))
 			print("Body:",body)
 			print(string.format(
-				"H: %.1f | T: %.1f | E: %.1f | I: %.1f | C: %.1f",
-				body.Hunger,
-				body.Thirst,
+				"B: %.1f | O2: %.1f | E: %.1f | I: %.1f | C: %.1f | AB: %.1f",
+				body.Brain,
+				body.Oxygen,
 				body.Energy,
 				body.Immunity,
-				body.Consciousness
+				body.Consciousness,
+				body.AllBleeds
 				))
 			return
 		end
