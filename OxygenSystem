@@ -41,6 +41,17 @@ function OxygenSystem.Update(body, dt)
 	if body.OxygenBlocked then
 		lungFactor = 0
 	end
+	
+	-- ===== BRAIN DAMAGE =====
+	if body.Oxygen < 5 then
+		body.Brain -= 1.5 * dt
+	end
+	
+	body.Brain = math.max(body.Brain, 0)
+
+	if body.Brain <= 0 then
+		body.States.Dead = true
+	end
 
 	lungFactor = clamp(lungFactor, 0, 1)
 
