@@ -54,6 +54,8 @@ function ConsciousnessSystem.Update(body, dt)
 
 	-- TEMPERATURE
 	local temperatureFactor = GetTemperatureFactor(body.Temperature)
+	
+	
 
 	local final =
 		body.MaxBrain
@@ -62,7 +64,8 @@ function ConsciousnessSystem.Update(body, dt)
 		* oxygenFactor
 		* temperatureFactor
 
-	body.Consciousness = math.clamp(final, 0, body.Brain)
+	local safeBrain = math.max(body.Brain or 0, 0)
+	body.Consciousness = math.clamp(final, 0, safeBrain)
 
 end
 
