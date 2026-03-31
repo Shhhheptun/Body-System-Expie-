@@ -23,7 +23,6 @@ local Config = require(StorageBodySystem:WaitForChild("Expie_Config"))
 local BodyData = require(StorageBodySystem:WaitForChild("BodyData"))
 
 -- SYSTEMS
-
 local Systems = ServerBodySystem.Systems
 
 -- AUTO LOAD SYSTEMS
@@ -74,6 +73,8 @@ BodyService.__index = BodyService
 BodyService.Bodies = {}
 
 BodyService.ObservedStats = {
+	Adrenaline = 0.01,
+	Pain = 0.01,
 	Hunger = 0.01,
 	Thirst = 0.01,
 	Energy = 0.01,
@@ -522,11 +523,10 @@ function BodyService:UpdateBody(body, dt)
 		if logTimer >= 1 then
 			logTimer = 0
 			print(self:CheckObservedStats(body))
-			print("Body:",body)
 			print(string.format(
-				"B: %.1f | O2: %.1f | E: %.1f | I: %.1f | C: %.1f | AB: %.1f",
-				body.Brain,
-				body.Oxygen,
+				"A: %.1f | P: %.1f | E: %.1f | I: %.1f | C: %.1f | AB: %.1f",
+				body.Adrenaline,
+				body.Pain,
 				body.Energy,
 				body.Immunity,
 				body.Consciousness,
