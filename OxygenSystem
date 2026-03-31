@@ -33,7 +33,7 @@ function OxygenSystem.Update(body, dt)
 
 	-- ===== ЛЁГКИЕ =====
 	local lungFactor = 1
-
+	
 	if body.MaxHemothorax > 0 then
 		lungFactor = 1 - (body.Hemothorax / body.MaxHemothorax)
 	end
