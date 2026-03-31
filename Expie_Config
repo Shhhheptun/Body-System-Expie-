@@ -79,6 +79,7 @@ WETNESS = 0,
 MIN_WETNESS = 0,
 
 -- АДРЕНАЛИН
+MIN_ADRENALINE = 0,
 ADRENALINE = 0,
 MAX_ADRENALINE = 100,
 
@@ -93,6 +94,7 @@ SHOCK = 0,
 MAX_SHOCK = 1,
 
 -- ЛОКАЛЬНАЯ БОЛЬ
+MIN_LIMB_PAIN = 0,
 LIMB_PAIN = 0,
 MAX_LIMB_PAIN = 100,
 
@@ -133,4 +135,3 @@ MAX_INTERNAL_BLEEDING = 427.5,
 }
 
 return Config
-
