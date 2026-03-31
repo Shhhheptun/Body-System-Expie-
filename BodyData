@@ -30,6 +30,8 @@ function BodyData.new()
 	self.MaxPain = G.MAX_PAIN
 	self.MinPain = G.MIN_PAIN
 	
+	self.basePain = self.Pain -- броу ну что это за нахуй:_(
+	
 	self.Shock = G.SHOCK
 	self.MaxShock = G.MAX_SHOCK
 	self.MinShock = G.MIN_SHOCK
@@ -43,6 +45,8 @@ function BodyData.new()
 	self.MaxAllBleeds = G.MAX_ALL_BLEEDS
 	
 	self.HeartRate = 80
+	
+	self.MinAdrenaline = G.MIN_ADRENALINE
 	self.Adrenaline = G.ADRENALINE
 	self.MaxAdrenaline = G.MAX_ADRENALINE
 	
