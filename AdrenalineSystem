@@ -1,0 +1,50 @@
+-- AdrenalineSystem
+-- уменьшает боль на половину текущего адреналина (как в вики)
+
+local AdrenalineSystem = {}
+
+local function clamp(v, min, max)
+	return math.max(min, math.min(max, v))
+end
+
+function AdrenalineSystem.Update(body, dt)
+
+	-- ===== АДРЕНАЛИН =====
+	local adrenaline = clamp(
+		body.Adrenaline or 0,
+		0,
+		body.MaxAdrenaline or 100
+	)
+
+	body.Adrenaline = adrenaline
+
+	-- ===== БАЗОВАЯ БОЛЬ =====
+	-- ВАЖНО: это должна быть "сырая" боль (не изменённая адреналином)
+	local basePain = clamp(
+		body.BasePain or body.Pain or 0,
+		body.MinPain or 0,
+		body.MaxPain or 100
+	)
+
+	-- ===== ПРИМЕНЕНИЕ АДРЕНАЛИНА =====
+	-- 50 адреналина → -25 боли
+	local reducedPain = basePain - (adrenaline * 0.5)
+
+	body.Pain = clamp(
+		reducedPain,
+		body.MinPain or 0,
+		body.MaxPain or 100
+	)
+
+	-- ===== ДЕГРАДАЦИЯ АДРЕНАЛИНА =====
+	local decayRate = 1 -- скорость спада (настройка)
+
+	body.Adrenaline = clamp(
+		adrenaline - decayRate * dt,
+		0,
+		body.MaxAdrenaline or 100
+	)
+
+end
+
+return AdrenalineSystem
