@@ -1,0 +1,149 @@
+-- BloodSystem
+-- ServerScriptService/BodySystem/Systems/BloodSystem
+
+local BloodSystem = {}
+
+local function clamp(v,min,max)
+	return math.max(min,math.min(max,v))
+end
+
+local LimbWeights = {
+	Head = 1,
+	Chest = 1,
+	Stomach = 1,
+	LeftThigh = 1,
+	RightThigh = 1,
+	LeftShin = 1,
+	RightShin = 1,
+	LeftForearm = 1,
+	RightForearm = 1,
+	LeftShoulder = 1,
+	RightShoulder = 1,
+}
+
+-- Константы новой системы кровотечения
+local BLEED_SPEED_MULT = 0.006
+local MAX_BLEED_RATE = 1.80 -- л/мин при 0% кожи
+local NATURAL_SLOWDOWN = 0.027 -- л/мин естественное замедление без осколка
+
+-- Константы внутреннего кровотечения
+local INTERNAL_BLEED_MULT = 0.0057
+local MAX_INTERNAL_BLEED_RATE = 0.21375 -- л/мин максимальная скорость
+local INTERNAL_BLEED_CAP = 0.855 -- л/мин абсолютный лимит (4x от макс)
+local INTERNAL_BLEED_INDICATOR = 0.04275 -- л/мин порог индикатора
+local HEMOTHORAX_INCREASE_RATE = 0.044 -- л/мин при индикаторе
+local HEMOTHORAX_DECREASE_RATE = 0.036 -- л/мин ниже индикатора
+local HEMOTHORAX_OXYGEN_PENALTY = 0.66 -- снижение макс кислорода за пункт выше 10
+local CHEST_PAIN_PER_POINT = 0.25 -- боль за пункт скорости
+
+function BloodSystem.Update(body, dt)
+
+	local totalBleed = 0 -- в мл/сек
+
+	for name, part in pairs(body.Parts) do
+		-- ===== РАСЧЁТ СКОРОСТИ КРОВОТЕЧЕНИЯ =====
+		local bleedAmount = part.LimbBleed or 0
+		local skinCondition = part.Skin or 100
+		local hasShrapnel = part.Shrapnel or false
+
+		-- Базовая скорость: (bleedAmount × bleedSpeedMult) × 3 л/мин
+		local rawBleedRate = (bleedAmount * BLEED_SPEED_MULT) * 3
+
+		-- Лимит от состояния кожи: 1.80 л/мин при 0%, 0 л/мин при 100%
+		local maxBleedRate = MAX_BLEED_RATE * (100 - skinCondition) / 100
+
+		-- Итоговая скорость (ограничена кожей)
+		local bleedRate = math.min(rawBleedRate, maxBleedRate)
+
+		-- Естественное замедление если нет осколка
+		if not hasShrapnel and bleedRate > 0 then
+			bleedRate = math.max(bleedRate - NATURAL_SLOWDOWN, 0)
+		end
+
+		-- Конвертация: л/мин → мл/сек (× 1000 / 60)
+		local bleedMlPerSec = bleedRate * 1000 / 60
+
+		-- Применяем вес конечности
+		local weight = LimbWeights[name] or 1
+		totalBleed += bleedMlPerSec * weight
+
+		-- ===== ЕСТЕСТВЕННОЕ ЗАМЕДЛЕНИЕ КРОВОТЕЧЕНИЯ =====
+		-- LimbBleed постепенно уменьшается если нет осколка
+		if not hasShrapnel and bleedAmount > 0 then
+			-- 0.027 л/мин соответствует уменьшению LimbBleed примерно на 1.5 в минуту
+			local bleedDecayRate = 1.5 / 60 -- в секунду
+			part.LimbBleed = math.max(bleedAmount - bleedDecayRate * dt, 0)
+		end
+	end
+
+	-- ===== ВНУТРЕННЕЕ КРОВОТЕЧЕНИЕ =====
+	local internalBleedValue = body.InternalBleeding or 0
+	
+	-- Расчёт скорости: (internalBleedValue × INTERNAL_BLEED_MULT) × 3
+	local rawInternalRate = (internalBleedValue * INTERNAL_BLEED_MULT) * 3
+	
+	-- Ограничение максимальной скоростью
+	local internalBleedRate = math.min(rawInternalRate, MAX_INTERNAL_BLEED_RATE)
+	
+	-- Абсолютный лимит (не может превышать 4x от макс)
+	internalBleedRate = math.min(internalBleedRate, INTERNAL_BLEED_CAP)
+	
+	-- Конвертация: л/мин → мл/сек
+	local internalMlPerSec = internalBleedRate * 1000 / 60
+	totalBleed += internalMlPerSec
+	
+	-- ===== ГЕМОТОРАКС =====
+	-- Инициализация если нет
+	body.Hemothorax = body.Hemothorax or 0
+	body.MaxHemothorax = body.MaxHemothorax or 100
+	
+	if internalBleedRate >= INTERNAL_BLEED_INDICATOR then
+		-- Гемоторакс увеличивается линейно от скорости
+		local hemothoraxIncrease = HEMOTHORAX_INCREASE_RATE * (internalBleedRate / INTERNAL_BLEED_INDICATOR)
+		body.Hemothorax = math.min(body.Hemothorax + hemothoraxIncrease * dt, body.MaxHemothorax)
+		
+		-- Боль в грудной клетке
+		body.ChestPain = (body.ChestPain or 0) + CHEST_PAIN_PER_POINT * internalBleedRate * dt
+	else
+		-- Гемоторакс уменьшается
+		body.Hemothorax = math.max(body.Hemothorax - HEMOTHORAX_DECREASE_RATE * dt, 0)
+	end
+	
+	-- Сохраняем скорость для отображения
+	body.InternalBleedRate = internalBleedRate
+
+	body.AllBleeds = totalBleed
+
+	-- ===== ПОТЕРЯ КРОВИ =====
+	body.Blood -= totalBleed * dt
+
+	-- ===== РЕГЕН =====
+
+	local targetBlood = body.NormalBlood or 5000
+
+	local hungerFactor = clamp(body.Hunger / 100, 0, 1)
+
+	local scale = body.MaxBlood / 5000
+	local regenRate = 0.875 * hungerFactor * scale
+
+	if body.Blood < targetBlood then
+		body.Blood += regenRate * dt
+	elseif body.Blood > targetBlood then
+		body.Blood -= regenRate * dt
+	end
+
+	-- clamp
+	body.Blood = clamp(body.Blood, body.MinBlood, body.MaxBlood)
+
+	-- ===== ВЯЗКОСТЬ КРОВИ =====
+	-- Вязкость возвращается к минимуму со скоростью 9 ед/мин (0.15 ед/сек)
+	local viscosityDecayRate = 9 / 60 -- 9 единиц в минуту
+	local minViscosity = body.MinBloodViscosity or 0
+
+	if body.BloodViscosity > minViscosity then
+		body.BloodViscosity = math.max(body.BloodViscosity - viscosityDecayRate * dt, minViscosity)
+	end
+
+end
+
+return BloodSystem

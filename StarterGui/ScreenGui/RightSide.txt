@@ -1,0 +1,188 @@
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local player = Players.LocalPlayer
+
+-- ЖДЕМ БОДИ
+local BodyState = ReplicatedStorage:WaitForChild("BodySystem"):WaitForChild("BodyState")
+local playerFolder = BodyState:WaitForChild(tostring(player.UserId))
+
+local screen = script.Parent
+
+-- ГЛАВНЫЙ ФРЕЙМ
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 300, 1, 0)
+frame.Position = UDim2.new(1, -300, 0, 0)
+frame.BackgroundTransparency = 0.3
+frame.Parent = screen
+
+-- ЗАГОЛОВОК ВЫБРАННОЙ ЧАСТИ
+local selectedLabel = Instance.new("TextLabel")
+selectedLabel.Size = UDim2.new(1, 0, 0, 30)
+selectedLabel.Text = "Выберите часть тела"
+selectedLabel.TextColor3 = Color3.fromRGB(255, 255, 100)
+selectedLabel.TextSize = 18
+selectedLabel.Font = Enum.Font.GothamBold
+selectedLabel.BackgroundTransparency = 1
+selectedLabel.Parent = frame
+
+-- КОНТЕЙНЕР ДЛЯ КНОПОК
+local buttonsFrame = Instance.new("Frame")
+buttonsFrame.Size = UDim2.new(1, 0, 0, 280)
+buttonsFrame.Position = UDim2.new(0, 0, 0, 30)
+buttonsFrame.BackgroundTransparency = 1
+buttonsFrame.Parent = frame
+
+local buttonsLayout = Instance.new("UIListLayout")
+buttonsLayout.Parent = buttonsFrame
+
+-- РАЗДЕЛИТЕЛЬ
+local separator = Instance.new("TextLabel")
+separator.Size = UDim2.new(1, 0, 0, 25)
+separator.Position = UDim2.new(0, 0, 0, 310)
+separator.Text = "═══ СТАТИСТИКА ═══"
+separator.TextColor3 = Color3.fromRGB(200, 200, 200)
+separator.BackgroundTransparency = 1
+separator.Parent = frame
+
+-- ОКНО СТАТОВ
+local statFrame = Instance.new("Frame")
+statFrame.Size = UDim2.new(1, 0, 1, -340)
+statFrame.Position = UDim2.new(0, 0, 0, 340)
+statFrame.BackgroundTransparency = 1
+statFrame.Parent = frame
+
+local statLayout = Instance.new("UIListLayout")
+statLayout.Parent = statFrame
+
+local statLabels = {}
+
+-- Список частей тела
+local bodyParts = {"Head", "Chest", "Stomach", "LeftShoulder", "RightShoulder", "LeftForearm", "RightForearm", "LeftThigh", "RightThigh", "LeftShin", "RightShin"}
+
+local selectedPart = nil
+
+-- Создаем кнопки
+for _, partName in ipairs(bodyParts) do
+	local btn = Instance.new("TextButton")
+	btn.Size = UDim2.new(1, 0, 0, 22)
+	btn.Text = partName
+	btn.Name = partName
+	btn.TextColor3 = Color3.fromRGB(200, 200, 200)
+	btn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+	btn.Parent = buttonsFrame
+
+	btn.MouseButton1Click:Connect(function()
+		selectedPart = partName
+		selectedLabel.Text = ">>> " .. partName .. " <<<"
+		-- Подсвечиваем выбранную кнопку
+		for _, b in ipairs(buttonsFrame:GetChildren()) do
+			if b:IsA("TextButton") then
+				if b.Name == partName then
+					b.BackgroundColor3 = Color3.fromRGB(80, 80, 120)
+					b.TextColor3 = Color3.fromRGB(255, 255, 255)
+				else
+					b.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+					b.TextColor3 = Color3.fromRGB(200, 200, 200)
+				end
+			end
+		end
+	end)
+end
+
+local function createStatLabel()
+	local lbl = Instance.new("TextLabel")
+	lbl.Size = UDim2.new(1, 0, 0, 20)
+	lbl.BackgroundTransparency = 1
+	lbl.TextXAlignment = Enum.TextXAlignment.Left
+	lbl.TextColor3 = Color3.fromRGB(255, 255, 255)
+	lbl.Parent = statFrame
+	return lbl
+end
+
+-- Список States для отображения
+local stateNames = {"Dead", "Unconscious", "Concussed", "Sleep", "OxygenBlocked"}
+
+game:GetService("RunService").RenderStepped:Connect(function()
+	local body = playerFolder:FindFirstChild("Body")
+	if not body then return end
+
+	-- Очищаем старые лейблы
+	for _, lbl in pairs(statLabels) do
+		lbl.Text = ""
+	end
+
+	if not selectedPart then return end
+
+	local labelIndex = 0
+
+	-- Показываем данные выбранной части
+	local muscle = body:GetAttribute(selectedPart .. "_Muscle")
+	local skin = body:GetAttribute(selectedPart .. "_Skin")
+	local infection = body:GetAttribute(selectedPart .. "_Infection")
+
+	-- Muscle
+	labelIndex += 1
+	if not statLabels[labelIndex] then
+		statLabels[labelIndex] = createStatLabel()
+	end
+	if muscle then
+		statLabels[labelIndex].Text = "Muscle: " .. string.format("%.2f", muscle)
+		statLabels[labelIndex].TextColor3 = Color3.fromRGB(100, 200, 255)
+	else
+		statLabels[labelIndex].Text = "Muscle: --"
+	end
+
+	-- Skin
+	labelIndex += 1
+	if not statLabels[labelIndex] then
+		statLabels[labelIndex] = createStatLabel()
+	end
+	if skin then
+		statLabels[labelIndex].Text = "Skin: " .. string.format("%.2f", skin)
+		statLabels[labelIndex].TextColor3 = Color3.fromRGB(255, 200, 100)
+	else
+		statLabels[labelIndex].Text = "Skin: --"
+	end
+
+	-- Infection
+	labelIndex += 1
+	if not statLabels[labelIndex] then
+		statLabels[labelIndex] = createStatLabel()
+	end
+	if infection then
+		statLabels[labelIndex].Text = "Infection: " .. string.format("%.2f", infection)
+		statLabels[labelIndex].TextColor3 = Color3.fromRGB(255, 100, 100)
+	else
+		statLabels[labelIndex].Text = "Infection: --"
+	end
+
+	-- Разделитель для States
+	labelIndex += 1
+	if not statLabels[labelIndex] then
+		statLabels[labelIndex] = createStatLabel()
+	end
+	statLabels[labelIndex].Text = "─── States ───"
+	statLabels[labelIndex].TextColor3 = Color3.fromRGB(150, 150, 150)
+
+	-- Показываем States
+	for _, stateName in ipairs(stateNames) do
+		local stateValue = body:GetAttribute("State_" .. stateName)
+		
+		labelIndex += 1
+		if not statLabels[labelIndex] then
+			statLabels[labelIndex] = createStatLabel()
+		end
+		
+		if stateValue == true then
+			statLabels[labelIndex].Text = "● " .. stateName .. ": Да"
+			statLabels[labelIndex].TextColor3 = Color3.fromRGB(100, 255, 100)
+		elseif stateValue == false then
+			statLabels[labelIndex].Text = "○ " .. stateName .. ": Нет"
+			statLabels[labelIndex].TextColor3 = Color3.fromRGB(255, 100, 100)
+		else
+			statLabels[labelIndex].Text = "? " .. stateName .. ": nil"
+			statLabels[labelIndex].TextColor3 = Color3.fromRGB(150, 150, 150)
+		end
+	end
+end)

@@ -1,0 +1,272 @@
+-- InfectionSystem
+-- ServerScriptService/BodySystem/Systems/InfectionSystem
+-- Система развития и распространения инфекций
+
+local InfectionSystem = {}
+
+local DEBUG = true
+local logTimer = 0
+
+-- СЕПСИС
+local BASE_SEPSIS_RATE = 0.0277
+local SEPSIS_DECAY = 0.07
+
+-- время между распространениями инфекции
+local SPREAD_INTERVAL = 30
+
+-- соединение конечностей
+local LimbGraph = {
+
+	Head = {"Chest"},
+
+	Chest = {"Head","LeftShoulder","RightShoulder","Stomach"},
+
+	Stomach = {"Chest","LeftThigh","RightThigh"},
+
+	LeftShoulder = {"Chest","LeftForearm"},
+	RightShoulder = {"Chest","RightForearm"},
+
+	LeftForearm = {"LeftShoulder"},
+	RightForearm = {"RightShoulder"},
+
+	LeftThigh = {"Stomach","LeftShin"},
+	RightThigh = {"Stomach","RightShin"},
+
+	LeftShin = {"LeftThigh"},
+	RightShin = {"RightThigh"}
+}
+
+-- clamp
+local function clamp(v,min,max)
+	return math.max(min,math.min(max,v))
+end
+
+-- growth rate от иммунитета
+local function GetGrowthRate(immunity, disinfected)
+
+	local base = 0.12 -- % per sec
+
+	local i = immunity
+	local m = 1
+
+	-- 80–120: стабильная зона
+	if i >= 80 and i <= 120 then
+		m = 1
+
+		-- ниже 80: ускорение
+	elseif i < 80 then
+		local d = (80 - i) / 80
+		m = 1 + (d * d * 2.5) -- квадратичная кривая
+
+		-- ниже 50: резкий обвал
+		if i < 50 then
+			local d2 = (50 - i) / 50
+			m += d2 * 2.0
+		end
+
+		-- выше 120: замедление
+	elseif i > 120 then
+		local d = (i - 120) / 80
+		m = 1 - (d * 1.2)
+
+		-- hard cap зона
+		if i >= 195.8 then
+			m = 0
+		elseif i >= 195 then
+			m = -3.57
+		end
+	end
+
+	-- дезинфекция (фиксированное значение из диздока)
+	if disinfected then
+		m -= 0.1224 / base -- нормализация под %/sec
+	end
+
+	return base * m
+end
+
+-- случайная соседняя конечность
+local function ChooseRandomNeighbor(limb, body)
+
+	local neighbors = LimbGraph[limb]
+	if not neighbors then return nil end
+
+	local candidates = {}
+
+	for _,n in ipairs(neighbors) do
+
+		local part = body.Parts[n]
+
+		if part and part.Infection == 0 then
+			table.insert(candidates,n)
+		end
+
+	end
+
+	if #candidates == 0 then
+		return nil
+	end
+
+	return candidates[math.random(#candidates)]
+
+end
+
+local function DebugPrint(body, growthRate, sepsisRate)
+
+	print("╔════════════ INFECTION DEBUG ════════════╗") 
+	print(string.format(
+		"Sepsis: %.2f | SepsisRate: %.4f | GrowthRate: %.4f | Immunity: %.1f",
+		body.Sepsis or 0,
+		sepsisRate or 0,
+		growthRate or 0,
+		body.Immunity or 0
+		))
+
+	print("├─────────────────────────────────────────")
+
+	for limb, part in pairs(body.Parts) do
+
+		print(string.format(
+			"%-14s : I-%6.2f | S-%6.2f",
+			limb,
+			part.Infection,
+			part.Skin
+			))
+
+	end
+
+	print("╚═════════════════════════════════════════╝")
+
+end
+
+function InfectionSystem.Update(body, dt)
+
+	if not body.Parts then return end
+
+	local immunity = body.Immunity or 100
+	local disinfected = body.Disinfected == true
+
+	local growthRate = GetGrowthRate(immunity, disinfected)
+
+	local totalInfection = 0
+	local maxInfection = 0
+
+	for limb, part in pairs(body.Parts) do
+
+		local infection = part.Infection
+
+		-- появление инфекции (если есть рана)
+		if infection == 0 and part.Skin < 85 then
+			infection = 0.1
+		end
+
+		-- развитие инфекции
+		if infection > 0 then
+			infection += growthRate * dt
+		end
+
+		infection = math.clamp(infection, 0, 100)
+
+		-- если регрессия и инфекция около 0 → фиксируем в 0
+		if infection < 0.05 then
+			infection = 0
+		end
+
+		part.Infection = infection
+
+		totalInfection += part.Infection
+
+		if infection > maxInfection then
+			maxInfection = infection
+		end
+
+	end
+
+	-- обновляем общую инфекцию как максимум из конечностей
+	body.Infection = maxInfection
+
+	-- ТАЙМЕР РАСПРОСТРАНЕНИЯ
+	body.InfectionSpreadTimer = (body.InfectionSpreadTimer or 0) + dt
+
+	if body.InfectionSpreadTimer >= SPREAD_INTERVAL then
+
+		body.InfectionSpreadTimer = 0
+
+		local infectedLimbs = {}
+
+		for limb, part in pairs(body.Parts) do
+
+			if part.Infection >= 90 then
+
+				local neighbors = LimbGraph[limb]
+
+				if neighbors then
+
+					for _,n in ipairs(neighbors) do
+
+						local neighborPart = body.Parts[n]
+
+						if neighborPart and neighborPart.Infection == 0 then
+							table.insert(infectedLimbs, limb)
+							break
+						end
+
+					end
+
+				end
+
+			end
+
+		end
+
+		if #infectedLimbs > 0 then
+
+			local source = infectedLimbs[math.random(#infectedLimbs)]
+			local target = ChooseRandomNeighbor(source, body)
+
+			if target then
+				body.Parts[target].Infection = 1
+			end
+
+		end
+
+	end
+	
+	
+
+	-- СЕПСИС
+	body.Sepsis = body.Sepsis or 0
+
+	local sepsisRate = 0
+
+	if totalInfection > 100 then
+
+		local multiplier = totalInfection / 100
+		sepsisRate = BASE_SEPSIS_RATE * multiplier
+
+		body.Sepsis += sepsisRate * dt
+
+	else
+
+		sepsisRate = -SEPSIS_DECAY
+		body.Sepsis -= SEPSIS_DECAY * dt
+
+	end
+
+	body.Sepsis = clamp(body.Sepsis,0,100)
+
+	-- DEBUG
+	if DEBUG then
+
+		logTimer += dt
+
+		if logTimer >= 1 then
+			logTimer = 0
+			DebugPrint(body, growthRate, sepsisRate)
+		end
+
+	end
+
+end
+
+return InfectionSystem

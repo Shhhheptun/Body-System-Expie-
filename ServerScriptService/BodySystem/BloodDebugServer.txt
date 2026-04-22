@@ -1,0 +1,128 @@
+-- BloodDebugServer - Обработчик для BloodDebugGUI
+-- ServerScriptService.BodySystem.BloodDebugServer
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local BodyService = require(script.Parent:WaitForChild("BodyService"))
+
+local remote = ReplicatedStorage.BodySystem:WaitForChild("BloodDebugRemote")
+local func = ReplicatedStorage.BodySystem:WaitForChild("BloodDebugFunc")
+
+-- ===== ФУНКЦИЯ ПОЛУЧЕНИЯ ДАННЫХ =====
+
+func.OnServerInvoke = function(player)
+	local body = BodyService.Bodies[player]
+	if not body then
+		return nil
+	end
+	
+	-- Собираем данные для отображения
+	local data = {
+		Blood = body.Blood,
+		NormalBlood = body.NormalBlood,
+		MaxBlood = body.MaxBlood,
+		Oxygen = body.Oxygen,
+		MaxOxygen = body.MaxOxygen,
+		BloodViscosity = body.BloodViscosity,
+		AllBleeds = body.AllBleeds,
+		InternalBleeding = body.InternalBleeding or 0,
+		InternalBleedRate = body.InternalBleedRate or 0,
+		Hemothorax = body.Hemothorax or 0,
+		MaxHemothorax = body.MaxHemothorax or 100,
+		Parts = {}
+	}
+	
+	for name, part in pairs(body.Parts) do
+		data.Parts[name] = {
+			LimbBleed = part.LimbBleed,
+			Skin = part.Skin,
+			Shrapnel = part.Shrapnel
+		}
+	end
+	
+	return data
+end
+
+-- ===== ОБРАБОТКА ИЗМЕНЕНИЯ ПАРАМЕТРОВ =====
+
+remote.OnServerEvent:Connect(function(player, action, params)
+	local body = BodyService.Bodies[player]
+	if not body then return end
+	
+	if action == "SetLimbBleed" then
+		local limb = params.Limb
+		local value = params.Value
+		if body.Parts[limb] then
+			body.Parts[limb].LimbBleed = value
+			print(string.format("[BloodDebug] %s.LimbBleed = %.1f", limb, value))
+		end
+		
+	elseif action == "SetSkin" then
+		local limb = params.Limb
+		local value = params.Value
+		if body.Parts[limb] then
+			body.Parts[limb].Skin = value
+			print(string.format("[BloodDebug] %s.Skin = %.1f", limb, value))
+		end
+		
+	elseif action == "SetShrapnel" then
+		local limb = params.Limb
+		local value = params.Value
+		if body.Parts[limb] then
+			body.Parts[limb].Shrapnel = value
+			print(string.format("[BloodDebug] %s.Shrapnel = %s", limb, tostring(value)))
+		end
+		
+	elseif action == "SetBloodViscosity" then
+		local value = params.Value
+		body.BloodViscosity = value
+		print(string.format("[BloodDebug] BloodViscosity = %.1f", value))
+		
+	elseif action == "SetInternalBleeding" then
+		local value = params.Value
+		body.InternalBleeding = value
+		print(string.format("[BloodDebug] InternalBleeding = %.1f", value))
+		
+	elseif action == "SetHemothorax" then
+		local value = params.Value
+		body.Hemothorax = value
+		print(string.format("[BloodDebug] Hemothorax = %.1f", value))
+		
+	elseif action == "PresetCritical" then
+		-- Критическое состояние
+		body.Blood = 2000
+		body.InternalBleeding = 50
+		body.Hemothorax = 30
+		for name, part in pairs(body.Parts) do
+			part.LimbBleed = 80
+			part.Skin = 20
+			part.Shrapnel = true
+		end
+		print("[BloodDebug] Applied CRITICAL preset")
+		
+	elseif action == "PresetLight" then
+		-- Лёгкое ранение
+		body.Blood = body.NormalBlood
+		body.Parts.Chest.LimbBleed = 30
+		body.Parts.Chest.Skin = 70
+		body.Parts.Chest.Shrapnel = false
+		print("[BloodDebug] Applied LIGHT preset")
+		
+	elseif action == "PresetReset" then
+		-- Сброс
+		body.Blood = body.NormalBlood
+		body.BloodViscosity = 0
+		body.InternalBleeding = 0
+		body.Hemothorax = 0
+		body.ChestPain = 0
+		for name, part in pairs(body.Parts) do
+			part.LimbBleed = 0
+			part.Skin = 100
+			part.Shrapnel = false
+		end
+		print("[BloodDebug] Applied RESET preset")
+	end
+end)
+
+print("[BloodDebugServer] Loaded")

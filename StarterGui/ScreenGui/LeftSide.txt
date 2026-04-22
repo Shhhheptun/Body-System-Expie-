@@ -1,0 +1,88 @@
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local player = Players.LocalPlayer
+
+-- ЖДЕМ БОДИ
+local BodyState = ReplicatedStorage:WaitForChild("BodySystem"):WaitForChild("BodyState")
+local playerFolder = BodyState:WaitForChild(tostring(player.UserId), 10)
+
+if not playerFolder then
+	warn("[LeftSide] Failed to find player folder")
+	return
+end
+
+-- UI
+local screen = script.Parent
+
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 300, 1, 0)
+frame.Position = UDim2.new(0, 0, 0, 0)
+frame.BackgroundTransparency = 0.3
+frame.Parent = screen
+
+local layout = Instance.new("UIListLayout")
+layout.Parent = frame
+
+-- ФИЛЬТР
+local function isValidStat(name, value)
+	-- Пропускаем данные о частях тела (содержат подчеркивание)
+	if string.find(name, "_") then
+		return false
+	end
+	-- Пропускаем States (они с префиксом State_)
+	if string.find(name, "State_") then
+		return false
+	end
+	if typeof(value) == "number" then
+		if string.find(name, "Min") or string.find(name, "Max") then
+			return false
+		end
+		return true
+	end
+	return false
+end
+
+local labels = {}
+
+local function createLabel(name)
+	local lbl = Instance.new("TextLabel")
+	lbl.Size = UDim2.new(1, 0, 0, 20)
+	lbl.TextXAlignment = Enum.TextXAlignment.Left
+	lbl.BackgroundTransparency = 1
+	lbl.Text = name
+	lbl.Parent = frame
+	return lbl
+end
+
+-- ОБНОВЛЕНИЕ
+game:GetService("RunService").RenderStepped:Connect(function()
+	local body = playerFolder:FindFirstChild("Body")
+	if not body then return end
+
+	local attributes = body:GetAttributes()
+
+	-- Числовые атрибуты
+	for key, value in pairs(attributes) do
+		if isValidStat(key, value) then
+			if not labels[key] then
+				labels[key] = createLabel(key)
+			end
+			labels[key].Text = key .. ": " .. string.format("%.2f", value)
+		end
+	end
+
+	-- Boolean States (берем из атрибутов, если прокинешь, или напрямую)
+	local states = {"Unconscious","Dead","Sleep","Concussed"}
+
+	for _, key in ipairs(states) do
+		local value = body:GetAttribute(key)
+
+		if value ~= nil then
+			if not labels[key] then
+				labels[key] = createLabel(key)
+			end
+			labels[key].Text = key .. ": " .. tostring(value)
+		end
+	end
+end)

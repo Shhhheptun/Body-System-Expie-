@@ -1,0 +1,77 @@
+-- Если что это просто штука для тестов и типа тут может быть почти чо угодно
+local DEBUG = true
+local function debugLog(...)
+	if not DEBUG then return end
+	print(...)
+end
+
+local Players = game:GetService("Players")
+local BodyService = require(game.ServerScriptService.BodySystem.BodyService)
+local MoodService = require(game.ServerScriptService.BodySystem.MoodService)
+
+debugLog("After require", BodyService)
+debugLog("CreateBody exists:", BodyService.CreateBody)
+
+-- ждём пока тело реально появится
+local player = Players.PlayerAdded:Wait()
+
+repeat task.wait() until BodyService.Bodies[player]
+
+
+local body = BodyService.Bodies[player]
+
+print("USING BODY:", body)
+
+task.wait(2)
+
+body.Hunger = 100
+
+body.Thirst = 100
+
+body.Energy = 100
+
+body.HasAntibiotics = false
+
+body.Parts.Head.LimbPain = 50
+
+body.Parts.Chest.LimbPain = 99
+
+body.Temperature = 40.1
+
+body.EnvironmentTemperature = 20
+
+task.wait(3)
+
+body.BloodViscosity = 10
+
+body.Oxygen = 100
+
+body.Brain = 100
+
+body.Consciousness = 30
+
+body.Adrenaline = 0
+
+body.Parts.Chest.Infection = 0
+
+body.Parts.Chest.Skin = 100
+
+body.Parts.Chest.Disinfected = false
+
+MoodService:Evaluate(player, body)
+
+local function printMood()
+	
+end
+
+
+
+debugLog("BodyService =", BodyService)
+debugLog("MoodService =", MoodService)
+
+
+
+debugLog("BodyServise:", BodyService)
+debugLog("CreateBody:", BodyService.CreateBody)
+
+

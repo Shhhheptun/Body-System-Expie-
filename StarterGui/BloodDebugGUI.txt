@@ -1,0 +1,500 @@
+-- BloodDebugGUI - Панель тестирования кровеносной системы
+-- StarterGui.BloodDebugGUI
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local UserInputService = game:GetService("UserInputService")
+
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+-- ===== КОНСТАНТЫ =====
+local MIN_WIDTH = 350
+local MIN_HEIGHT = 300
+local MAX_WIDTH = 600
+local MAX_HEIGHT = 700
+
+-- ===== СОЗДАНИЕ GUI =====
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "BloodDebugPanel"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = playerGui
+
+-- Главная рамка
+local mainFrame = Instance.new("Frame")
+mainFrame.Name = "MainFrame"
+mainFrame.Size = UDim2.new(0, 400, 0, 550)
+mainFrame.Position = UDim2.new(0, 20, 0.3, 0)
+mainFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 40)
+mainFrame.BorderSizePixel = 0
+mainFrame.Parent = screenGui
+
+local mainCorner = Instance.new("UICorner")
+mainCorner.CornerRadius = UDim.new(0, 8)
+mainCorner.Parent = mainFrame
+
+-- ===== ЗАГОЛОВОК (для перетаскивания) =====
+
+local titleBar = Instance.new("Frame")
+titleBar.Name = "TitleBar"
+titleBar.Size = UDim2.new(1, 0, 0, 36)
+titleBar.Position = UDim2.new(0, 0, 0, 0)
+titleBar.BackgroundColor3 = Color3.fromRGB(45, 45, 55)
+titleBar.BorderSizePixel = 0
+titleBar.Parent = mainFrame
+
+local titleBarCorner = Instance.new("UICorner")
+titleBarCorner.CornerRadius = UDim.new(0, 8)
+titleBarCorner.Parent = titleBar
+
+-- Нижняя часть titleBar чтобы скрыть скругление снизу
+local titleBarBottom = Instance.new("Frame")
+titleBarBottom.Size = UDim2.new(1, 0, 0, 10)
+titleBarBottom.Position = UDim2.new(0, 0, 1, -10)
+titleBarBottom.BackgroundColor3 = Color3.fromRGB(45, 45, 55)
+titleBarBottom.BorderSizePixel = 0
+titleBarBottom.Parent = titleBar
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, -80, 1, 0)
+title.Position = UDim2.new(0, 10, 0, 0)
+title.BackgroundTransparency = 1
+title.Text = "🩸 Blood Debug"
+title.TextColor3 = Color3.fromRGB(255, 120, 120)
+title.TextSize = 18
+title.Font = Enum.Font.GothamBold
+title.TextXAlignment = Enum.TextXAlignment.Left
+title.Parent = titleBar
+
+-- Кнопка сворачивания
+local minimizeBtn = Instance.new("TextButton")
+minimizeBtn.Size = UDim2.new(0, 28, 0, 28)
+minimizeBtn.Position = UDim2.new(1, -34, 0.5, -14)
+minimizeBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 75)
+minimizeBtn.Text = "−"
+minimizeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+minimizeBtn.TextSize = 18
+local minimizeCorner = Instance.new("UICorner")
+minimizeCorner.CornerRadius = UDim.new(0, 6)
+minimizeCorner.Parent = minimizeBtn
+minimizeBtn.Parent = titleBar
+
+-- ===== КОНТЕНТ =====
+
+local contentFrame = Instance.new("ScrollingFrame")
+contentFrame.Name = "ContentFrame"
+contentFrame.Size = UDim2.new(1, -20, 1, -46)
+contentFrame.Position = UDim2.new(0, 10, 0, 40)
+contentFrame.BackgroundTransparency = 1
+contentFrame.ScrollBarThickness = 6
+contentFrame.ScrollBarImageColor3 = Color3.fromRGB(100, 100, 120)
+contentFrame.CanvasSize = UDim2.new(0, 0, 0, 800)
+contentFrame.Parent = mainFrame
+
+local layout = Instance.new("UIListLayout")
+layout.Padding = UDim.new(0, 6)
+layout.Parent = contentFrame
+
+-- ===== РЕСАЙЗ ЭЛЕМЕНТЫ =====
+
+-- Углы для ресайза
+local resizeBottom = Instance.new("Frame")
+resizeBottom.Size = UDim2.new(1, 0, 0, 8)
+resizeBottom.Position = UDim2.new(0, 0, 1, -8)
+resizeBottom.BackgroundTransparency = 1
+resizeBottom.Parent = mainFrame
+
+local resizeRight = Instance.new("Frame")
+resizeRight.Size = UDim2.new(0, 8, 1, 0)
+resizeRight.Position = UDim2.new(1, -8, 0, 0)
+resizeRight.BackgroundTransparency = 1
+resizeRight.Parent = mainFrame
+
+local resizeCorner = Instance.new("Frame")
+resizeCorner.Size = UDim2.new(0, 16, 0, 16)
+resizeCorner.Position = UDim2.new(1, -16, 1, -16)
+resizeCorner.BackgroundTransparency = 1
+resizeCorner.Parent = mainFrame
+
+-- ===== ФУНКЦИИ СОЗДАНИЯ ЭЛЕМЕНТОВ =====
+
+local function createSection(name)
+	local section = Instance.new("TextLabel")
+	section.Size = UDim2.new(1, 0, 0, 28)
+	section.BackgroundColor3 = Color3.fromRGB(55, 55, 65)
+	section.BorderSizePixel = 0
+	section.Text = "  " .. name
+	section.TextColor3 = Color3.fromRGB(220, 220, 230)
+	section.TextSize = 13
+	section.Font = Enum.Font.GothamBold
+	section.TextXAlignment = Enum.TextXAlignment.Left
+	local sectionCorner = Instance.new("UICorner")
+	sectionCorner.CornerRadius = UDim.new(0, 4)
+	sectionCorner.Parent = section
+	section.Parent = contentFrame
+	return section
+end
+
+local function createSlider(name, min, max, default, callback)
+	local container = Instance.new("Frame")
+	container.Size = UDim2.new(1, 0, 0, 44)
+	container.BackgroundTransparency = 1
+	container.Parent = contentFrame
+	
+	local label = Instance.new("TextLabel")
+	label.Size = UDim2.new(1, 0, 0, 18)
+	label.BackgroundTransparency = 1
+	label.Text = name .. ": " .. tostring(default)
+	label.TextColor3 = Color3.fromRGB(200, 200, 210)
+	label.TextSize = 12
+	label.Font = Enum.Font.Gotham
+	label.TextXAlignment = Enum.TextXAlignment.Left
+	label.Parent = container
+	
+	local sliderBg = Instance.new("Frame")
+	sliderBg.Size = UDim2.new(1, 0, 0, 18)
+	sliderBg.Position = UDim2.new(0, 0, 0, 22)
+	sliderBg.BackgroundColor3 = Color3.fromRGB(55, 55, 65)
+	local bgCorner = Instance.new("UICorner")
+	bgCorner.CornerRadius = UDim.new(0, 4)
+	bgCorner.Parent = sliderBg
+	sliderBg.Parent = container
+	
+	local sliderFill = Instance.new("Frame")
+	sliderFill.Size = UDim2.new((default - min) / (max - min), 0, 1, 0)
+	sliderFill.BackgroundColor3 = Color3.fromRGB(255, 100, 100)
+	local fillCorner = Instance.new("UICorner")
+	fillCorner.CornerRadius = UDim.new(0, 4)
+	fillCorner.Parent = sliderFill
+	sliderFill.Parent = sliderBg
+	
+	local sliderBtn = Instance.new("TextButton")
+	sliderBtn.Size = UDim2.new(1, 0, 1, 0)
+	sliderBtn.BackgroundTransparency = 1
+	sliderBtn.Text = ""
+	sliderBtn.Parent = sliderBg
+	
+	local dragging = false
+	
+	sliderBtn.MouseButton1Down:Connect(function()
+		dragging = true
+		while dragging do
+			local mousePos = UserInputService:GetMouseLocation()
+			local relX = math.clamp((mousePos.X - sliderBg.AbsolutePosition.X) / sliderBg.AbsoluteSize.X, 0, 1)
+			local value = min + (max - min) * relX
+			sliderFill.Size = UDim2.new(relX, 0, 1, 0)
+			label.Text = name .. ": " .. string.format("%.1f", value)
+			callback(value)
+			task.wait()
+		end
+	end)
+	
+	sliderBtn.MouseButton1Up:Connect(function()
+		dragging = false
+	end)
+	
+	-- Функция для обновления значения слайдера
+	local function updateSlider(value)
+		local clampedValue = math.clamp(value, min, max)
+		local percent = (clampedValue - min) / (max - min)
+		sliderFill.Size = UDim2.new(percent, 0, 1, 0)
+		label.Text = name .. ": " .. string.format("%.1f", clampedValue)
+	end
+	
+	return container, label, sliderFill, updateSlider
+end
+
+local function createToggle(name, default, callback)
+	local container = Instance.new("Frame")
+	container.Size = UDim2.new(1, 0, 0, 32)
+	container.BackgroundTransparency = 1
+	container.Parent = contentFrame
+	
+	local label = Instance.new("TextLabel")
+	label.Size = UDim2.new(1, -60, 1, 0)
+	label.BackgroundTransparency = 1
+	label.Text = name
+	label.TextColor3 = Color3.fromRGB(200, 200, 210)
+	label.TextSize = 12
+	label.Font = Enum.Font.Gotham
+	label.TextXAlignment = Enum.TextXAlignment.Left
+	label.Parent = container
+	
+	local toggle = Instance.new("TextButton")
+	toggle.Size = UDim2.new(0, 50, 0, 26)
+	toggle.Position = UDim2.new(1, -55, 0.5, -13)
+	toggle.BackgroundColor3 = default and Color3.fromRGB(80, 180, 80) or Color3.fromRGB(70, 70, 80)
+	toggle.Text = default and "ON" or "OFF"
+	toggle.TextColor3 = Color3.fromRGB(255, 255, 255)
+	toggle.TextSize = 11
+	toggle.Font = Enum.Font.GothamBold
+	local toggleCorner = Instance.new("UICorner")
+	toggleCorner.CornerRadius = UDim.new(0, 6)
+	toggleCorner.Parent = toggle
+	toggle.Parent = container
+	
+	toggle.MouseButton1Click:Connect(function()
+		local isOn = toggle.Text == "OFF"
+		toggle.Text = isOn and "ON" or "OFF"
+		toggle.BackgroundColor3 = isOn and Color3.fromRGB(80, 180, 80) or Color3.fromRGB(70, 70, 80)
+		callback(isOn)
+	end)
+	
+	-- Функция для обновления состояния тумблера
+	local function updateToggle(value)
+		toggle.Text = value and "ON" or "OFF"
+		toggle.BackgroundColor3 = value and Color3.fromRGB(80, 180, 80) or Color3.fromRGB(70, 70, 80)
+	end
+	
+	return container, toggle, updateToggle
+end
+
+local function createDisplay(name)
+	local label = Instance.new("TextLabel")
+	label.Size = UDim2.new(1, 0, 0, 22)
+	label.BackgroundTransparency = 1
+	label.Text = name .. ": --"
+	label.TextColor3 = Color3.fromRGB(150, 200, 255)
+	label.TextSize = 12
+	label.Font = Enum.Font.Gotham
+	label.TextXAlignment = Enum.TextXAlignment.Left
+	label.Parent = contentFrame
+	return label
+end
+
+local function createButton(text, callback)
+	local btn = Instance.new("TextButton")
+	btn.Size = UDim2.new(0, 100, 0, 32)
+	btn.BackgroundColor3 = Color3.fromRGB(65, 65, 80)
+	btn.Text = text
+	btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+	btn.TextSize = 12
+	btn.Font = Enum.Font.Gotham
+	local btnCorner = Instance.new("UICorner")
+	btnCorner.CornerRadius = UDim.new(0, 6)
+	btnCorner.Parent = btn
+	btn.Parent = contentFrame
+	btn.MouseButton1Click:Connect(callback)
+	return btn
+end
+
+-- ===== ПОДКЛЮЧЕНИЕ К СЕРВЕРУ =====
+
+local remote = ReplicatedStorage:WaitForChild("BodySystem"):WaitForChild("BloodDebugRemote")
+local func = ReplicatedStorage:WaitForChild("BodySystem"):WaitForChild("BloodDebugFunc")
+
+-- ===== ИНТЕРФЕЙС =====
+
+-- Выбор конечности
+local limbNames = {"Head", "Chest", "Stomach", "LeftThigh", "RightThigh", "LeftShin", "RightShin", "LeftShoulder", "RightShoulder", "LeftForearm", "RightForearm"}
+local currentLimb = "Chest"
+local limbIndex = 2
+
+local limbBtn = Instance.new("TextButton")
+limbBtn.Size = UDim2.new(1, 0, 0, 32)
+limbBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 60)
+limbBtn.Text = "📍 Конечность: " .. currentLimb
+limbBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+limbBtn.TextSize = 13
+limbBtn.Font = Enum.Font.Gotham
+local limbCorner = Instance.new("UICorner")
+limbCorner.CornerRadius = UDim.new(0, 6)
+limbCorner.Parent = limbBtn
+limbBtn.Parent = contentFrame
+
+limbBtn.MouseButton1Click:Connect(function()
+	limbIndex = limbIndex % #limbNames + 1
+	currentLimb = limbNames[limbIndex]
+	limbBtn.Text = "📍 Конечность: " .. currentLimb
+	updateLimbUI()
+end)
+
+-- Слайдеры
+local bleedContainer, bleedLabel, bleedFill, updateBleedSlider = createSlider("LimbBleed", 0, 100, 0, function(v)
+	remote:FireServer("SetLimbBleed", {Limb = currentLimb, Value = v})
+end)
+
+local skinContainer, skinLabel, skinFill, updateSkinSlider = createSlider("Skin %", 0, 100, 100, function(v)
+	remote:FireServer("SetSkin", {Limb = currentLimb, Value = v})
+end)
+
+-- Тумблер Shrapnel
+local shrapnelContainer, shrapnelBtn, updateShrapnelToggle = createToggle("Shrapnel", false, function(v)
+	remote:FireServer("SetShrapnel", {Limb = currentLimb, Value = v})
+end)
+
+-- Функция обновления UI при переключении конечности
+local function updateLimbUI()
+	local success, data = pcall(function()
+		return func:InvokeServer()
+	end)
+	
+	if success and data and data.Parts and data.Parts[currentLimb] then
+		local limbData = data.Parts[currentLimb]
+		updateBleedSlider(limbData.LimbBleed or 0)
+		updateSkinSlider(limbData.Skin or 100)
+		updateShrapnelToggle(limbData.Shrapnel or false)
+	end
+end
+
+-- ===== ВНУТРЕННЕЕ КРОВОТЕЧЕНИЕ =====
+
+createSection("🫀 Внутреннее кровотечение")
+
+local internalBleedSlider = createSlider("InternalBleed", 0, 100, 0, function(v)
+	remote:FireServer("SetInternalBleeding", {Value = v})
+end)
+
+local hemothoraxSlider = createSlider("Hemothorax", 0, 100, 0, function(v)
+	remote:FireServer("SetHemothorax", {Value = v})
+end)
+
+-- Статистика
+createSection("📊 Статистика")
+
+local bloodDisplay = createDisplay("Blood")
+local bleedRateDisplay = createDisplay("Bleed Rate")
+local internalBleedDisplay = createDisplay("Internal Bleed")
+local hemothoraxDisplay = createDisplay("Hemothorax")
+local oxygenDisplay = createDisplay("Oxygen")
+local viscosityDisplay = createDisplay("BloodViscosity")
+
+-- Пресеты
+createSection("⚡ Пресеты")
+
+local presetsContainer = Instance.new("Frame")
+presetsContainer.Size = UDim2.new(1, 0, 0, 36)
+presetsContainer.BackgroundTransparency = 1
+presetsContainer.Parent = contentFrame
+
+local presetsLayout = Instance.new("UIListLayout")
+presetsLayout.FillDirection = Enum.FillDirection.Horizontal
+presetsLayout.Padding = UDim.new(0, 8)
+presetsLayout.Parent = presetsContainer
+
+local function addPresetBtn(text, callback)
+	local btn = Instance.new("TextButton")
+	btn.Size = UDim2.new(0, 90, 0, 32)
+	btn.BackgroundColor3 = Color3.fromRGB(65, 65, 80)
+	btn.Text = text
+	btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+	btn.TextSize = 11
+	btn.Font = Enum.Font.Gotham
+	local btnCorner = Instance.new("UICorner")
+	btnCorner.CornerRadius = UDim.new(0, 6)
+	btnCorner.Parent = btn
+	btn.Parent = presetsContainer
+	btn.MouseButton1Click:Connect(callback)
+end
+
+addPresetBtn("💀 Крит", function()
+	remote:FireServer("PresetCritical", {})
+end)
+
+addPresetBtn("🩹 Лёгкий", function()
+	remote:FireServer("PresetLight", {})
+end)
+
+addPresetBtn("🔄 Сброс", function()
+	remote:FireServer("PresetReset", {})
+end)
+
+-- ===== ЛОГИКА ПЕРЕТАСКИВАНИЯ =====
+
+local dragging = false
+local dragStartPos, dragStartMouse
+
+titleBar.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = true
+		dragStartPos = mainFrame.Position
+		dragStartMouse = UserInputService:GetMouseLocation()
+	end
+end)
+
+UserInputService.InputEnded:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = false
+	end
+end)
+
+UserInputService.InputChanged:Connect(function()
+	if dragging then
+		local mousePos = UserInputService:GetMouseLocation()
+		local delta = mousePos - dragStartMouse
+		mainFrame.Position = UDim2.new(
+			dragStartPos.X.Scale, dragStartPos.X.Offset + delta.X,
+			dragStartPos.Y.Scale, dragStartPos.Y.Offset + delta.Y
+		)
+	end
+end)
+
+-- ===== ЛОГИКА РЕСАЙЗА =====
+
+local resizing = false
+local resizeStartSize, resizeStartMouse
+
+resizeCorner.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		resizing = true
+		resizeStartSize = mainFrame.Size
+		resizeStartMouse = UserInputService:GetMouseLocation()
+		resizeCorner.BackgroundColor3 = Color3.fromRGB(100, 100, 120)
+	end
+end)
+
+UserInputService.InputEnded:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		resizing = false
+		resizeCorner.BackgroundTransparency = 1
+	end
+end)
+
+UserInputService.InputChanged:Connect(function()
+	if resizing then
+		local mousePos = UserInputService:GetMouseLocation()
+		local delta = mousePos - resizeStartMouse
+		local newWidth = math.clamp(resizeStartSize.X.Offset + delta.X, MIN_WIDTH, MAX_WIDTH)
+		local newHeight = math.clamp(resizeStartSize.Y.Offset + delta.Y, MIN_HEIGHT, MAX_HEIGHT)
+		mainFrame.Size = UDim2.new(0, newWidth, 0, newHeight)
+	end
+end)
+
+-- ===== ЛОГИКА СВОРАЧИВАНИЯ =====
+
+local isMinimized = false
+local savedSize = mainFrame.Size
+
+minimizeBtn.MouseButton1Click:Connect(function()
+	isMinimized = not isMinimized
+	if isMinimized then
+		savedSize = mainFrame.Size
+		mainFrame.Size = UDim2.new(0, savedSize.X.Offset, 0, 36)
+		minimizeBtn.Text = "+"
+	else
+		mainFrame.Size = savedSize
+		minimizeBtn.Text = "−"
+	end
+end)
+
+-- ===== ОБНОВЛЕНИЕ ДАННЫХ =====
+
+task.spawn(function()
+	while task.wait(0.5) do
+		local success, data = pcall(function()
+			return func:InvokeServer()
+		end)
+		
+		if success and data then
+			bloodDisplay.Text = string.format("Blood: %.0f / %.0f mL", data.Blood or 0, data.NormalBlood or 5000)
+			bleedRateDisplay.Text = string.format("Bleed Rate: %.2f mL/s", data.AllBleeds or 0)
+			internalBleedDisplay.Text = string.format("Internal Bleed: %.3f L/min", data.InternalBleedRate or 0)
+			hemothoraxDisplay.Text = string.format("Hemothorax: %.1f / %.1f", data.Hemothorax or 0, data.MaxHemothorax or 100)
+			oxygenDisplay.Text = string.format("Oxygen: %.1f / %.1f", data.Oxygen or 0, data.MaxOxygen or 100)
+			viscosityDisplay.Text = string.format("BloodViscosity: %.1f", data.BloodViscosity or 0)
+		end
+	end
+end)
+
+print("[BloodDebugGUI] Loaded successfully")
