@@ -1,0 +1,44 @@
+-- TemperatureZoneService
+-- ServerScriptService/BodySystem/TemperatureZoneService
+-- оно работает ._.
+
+local Players = game:GetService("Players")
+local BodyService = require(game.ServerScriptService.BodySystem.BodyService)
+
+local DEFAULT_TEMP = 20
+
+local function connectZone(zone)
+	if not zone:IsA("BasePart") then return end
+
+	local temperature = zone:GetAttribute("Temperature")
+	if temperature == nil then return end
+
+	zone.Touched:Connect(function(hit)
+		local character = hit.Parent
+		local player = Players:GetPlayerFromCharacter(character)
+		if not player then return end
+
+		local body = BodyService.Bodies[player]
+		if not body then return end
+
+		body.EnvironmentTemperature = temperature
+	end)
+
+	zone.TouchEnded:Connect(function(hit)
+		local character = hit.Parent
+		local player = Players:GetPlayerFromCharacter(character)
+		if not player then return end
+
+		local body = BodyService.Bodies[player]
+		if not body then return end
+
+		body.EnvironmentTemperature = DEFAULT_TEMP
+	end)
+end
+
+-- Подключаем все зоны
+for _, obj in ipairs(workspace:GetDescendants()) do
+	if string.find(obj.Name, "TemperatureZone") then
+		connectZone(obj)
+	end
+end

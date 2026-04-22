@@ -1,0 +1,45 @@
+-- ShockSystem
+-- шок от боли
+
+local ShockSystem = {}
+
+local function clamp(v, min, max)
+	return math.max(min, math.min(max, v))
+end
+
+function ShockSystem.Update(body, dt)
+
+	-- ===== БАЗА =====
+	local pain = body.BasePain or body.Pain or 0
+	local shock = body.Shock or 0
+
+	-- ===== РОСТ ОТ БОЛИ =====
+	-- если боль > 75 → растёт
+	if pain > 75 then
+		local shockGain = 3.33 -- в секунду
+		shock += shockGain * dt
+	else
+		-- небольшой спад если боли нет
+		local shockDecay = 1.5
+		shock -= shockDecay * dt
+	end
+
+	-- ===== CLAMP =====
+	shock = clamp(
+		shock,
+		body.MinShock or 0,
+		body.MaxShock or 100
+	)
+
+	body.Shock = shock
+
+	-- ===== ЭФФЕКТЫ =====
+
+	-- 66+ → потеря сознания
+	if shock >= 66 then
+		body.States.Unconscious = true
+	end
+
+end
+
+return ShockSystem

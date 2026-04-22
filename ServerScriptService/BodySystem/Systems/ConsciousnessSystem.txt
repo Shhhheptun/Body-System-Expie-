@@ -1,0 +1,72 @@
+-- ConsciousnessSystem
+-- ServerScriptService/BodySystem/Systems/ConsciousnessSystem
+
+local ConsciousnessSystem = {}
+
+local function GetTemperatureFactor(temp)
+
+	if temp <= 20 then
+		return 0.6
+	end
+
+	if temp <= 30 then
+		return 0.6 + (temp - 20) * (0.79 - 0.6) / 10
+	end
+
+	if temp <= 33 then
+		return 0.79 + (temp - 30) * (1 - 0.79) / 3
+	end
+
+	if temp <= 40.7 then
+		return 1
+	end
+
+	if temp <= 45 then
+		return 1 - (temp - 40.7) * 0.5 / (45 - 40.7)
+	end
+
+	if temp <= 52.2 then
+		return 0.5 - (temp - 45) * (0.5 - 0.275) / (52.2 - 45)
+	end
+
+	return 0.275
+
+end
+
+function ConsciousnessSystem.Update(body, dt)
+
+	local brainFactor = body.Brain / body.MaxBrain
+	brainFactor = math.clamp(brainFactor, 0, 1)
+
+	-- ENERGY
+	local energyThreshold = 35
+	local energyFactor = 1
+
+	if body.Energy < energyThreshold then
+		energyFactor = body.Energy / energyThreshold
+	end
+
+	energyFactor = math.clamp(energyFactor, 0, 1)
+
+	-- OXYGEN
+	local oxygenFactor = body.Oxygen / body.MaxOxygen
+	oxygenFactor = math.clamp(oxygenFactor, 0, 1)
+
+	-- TEMPERATURE
+	local temperatureFactor = GetTemperatureFactor(body.Temperature)
+	
+	
+
+	local final =
+		body.MaxBrain
+		* brainFactor
+		* energyFactor
+		* oxygenFactor
+		* temperatureFactor
+
+	local safeBrain = math.max(body.Brain or 0, 0)
+	body.Consciousness = math.clamp(final, 0, safeBrain)
+
+end
+
+return ConsciousnessSystem

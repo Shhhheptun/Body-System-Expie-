@@ -1,0 +1,34 @@
+local MovementAnimations = {
+
+	Idle = {
+		Default = "rbxassetid://IDLE_ID",
+	},
+
+	Walk = {
+		Forward  = "rbxassetid://WALK_FORWARD_ID",
+		Backward = "rbxassetid://WALK_BACKWARD_ID",
+		Left     = "rbxassetid://WALK_LEFT_ID",
+		Right    = "rbxassetid://WALK_RIGHT_ID",
+	},
+
+	Run = {
+		Forward  = "rbxassetid://RUN_FORWARD_ID",
+		Backward = "rbxassetid://RUN_BACKWARD_ID",
+		Left     = "rbxassetid://RUN_LEFT_ID",
+		Right    = "rbxassetid://RUN_RIGHT_ID",
+	},
+
+	Crouch = {
+		Idle     = "rbxassetid://CROUCH_IDLE_ID",
+		Forward  = "rbxassetid://CROUCH_FORWARD_ID",
+		Backward = "rbxassetid://CROUCH_BACKWARD_ID",
+	},
+
+	Special = {
+		Stagger  = "rbxassetid://STAGGER_ID",
+		Fall     = "rbxassetid://FALL_ID",
+		Land     = "rbxassetid://LAND_ID",
+	}
+}
+
+return MovementAnimations

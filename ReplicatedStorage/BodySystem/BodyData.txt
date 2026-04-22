@@ -1,0 +1,199 @@
+-- BodyData
+-- ReplicatedStorage/BodySystem/BodyData
+-- Тело и состояния игрока
+
+local Config = require(script.Parent:WaitForChild("Expie_Config"))
+
+local BodyData = {}
+BodyData.__index = BodyData
+-- ==============================
+-- СОЗДАНИЕ ТЕЛА
+-- ==============================
+function BodyData.new()
+	print("BodyData.new started")
+	
+	local self = setmetatable({}, BodyData)
+	
+	local G = Config.Global
+
+	-- ГЛОБАЛЬНЫЕ ПОКАЗАТЕЛИ (P.S - я каеш вряд ли буду обновлять типа что я доделал что сделал а что не трогал но похуй, распишу пока что чо уже готово и юзается)
+	
+	self.MaxBrain = G.MAX_BRAIN -- используется, но не все проверено и вероятно готово не полностью - "Ааааа... Бля... Голова... Почему цвета такие... Странные...? Металл...?"
+	self.Brain = G.BRAIN
+	self.MinBrain = G.MIN_BRAIN
+	
+	self.Consciousness = G.MAX_BRAIN -- частично готово, вроде бы не все сделал но пока что норм - "Аааааахх... Блять, что произошло...?
+	
+	self.HearingLoss = G.HEARING_LOSS -- нигде не юзается, требуются звуки и их источники - "Меня... Кто нибудь слышит...? Я ничего не слышу..."
+	self.MaxHearingLoss = G.MAX_HEARING_LOSS
+	self.MinHearingLoss = G.MIN_HEARING_LOSS
+
+	self.Pain = G.PAIN -- готово... вроде как - "Ай! блять, какого хуя ты творишь?"
+	self.MaxPain = G.MAX_PAIN
+	self.MinPain = G.MIN_PAIN
+	
+	self.BasePain = self.Pain -- блять ну что это за хуйня:_(
+	
+	self.Shock = G.SHOCK -- готов - "СУКА!!! БЛЯТЬ Я НЕ ВЫНЕСУ ЭТОГО...!    .    .    ."
+	self.MaxShock = G.MAX_SHOCK
+	self.MinShock = G.MIN_SHOCK
+
+	self.Blood = G.BLOOD
+	self.NormalBlood = G.NORMAL_BLOOD -- работает в штатном режиме, возможно потребуются изменения или модификации - "Интерестно, сколько его придется резать что бы вытекло все? Хи-хи:)"
+	self.MaxBlood = G.MAX_BLOOD
+	self.MinBlood = G.MIN_BLOOD
+	
+	self.AllBleeds = G.ALL_BLEEDS
+	self.MaxAllBleeds = G.MAX_ALL_BLEEDS -- работает - "Ухтыыы! Да из него кровь ручьем!"
+	
+	self.HeartRate = 80 -- не используется, нужна визуализация и немного медицинских знаний - "Я слышу как бьется твое сердце=)"
+	
+	self.MinAdrenaline = G.MIN_ADRENALINE -- работает, снижает уровень боли - "БЛЯТЬ БЛЯТЬ БЛЯТЬ БЛЯТЬ БЛЯТЬ!!! СУКА ВЫТАЩИТЕ МЕНЯ КТО НИБУДЬ ИЗ ЭТОГО ПИЗДЕЦА!"
+	self.Adrenaline = G.ADRENALINE
+	self.MaxAdrenaline = G.MAX_ADRENALINE
+	
+	self.MaxOxygen = G.MAX_OXYGEN
+	self.MaxOxygenEffective = G.MAX_OXYGEN_EFFECTIVE -- вроде как работает, возможно понадобятся фиксы или изменения 
+	self.Oxygen = G.OXYGEN
+	self.MinOxygen = G.MIN_OXYGEN
+	
+	self.OxygenBlocked = false -- удушье вроде как работает но вероятно сломано, нужна проверка - "Я... З-ды-АЮсь... Кто ни-удь...! Помоги... Те..."
+	self.HasAntibiotics = false -- работает - "Да ладно те, я здоров как бык!:D"
+	self.Energized = false -- работает - "ОУууу ДААА! Сука да я полон СИЛ И ЭНЕРГИИ!"
+	self.NonePainK_Overdose = false -- не используется
+	self.LastStand = false -- пока что не прописано, нужен тригер - "Еще не время сдаваться...   В С Т А В А Й . . ."
+	
+	self.MaxCaffeination = G.MAX_CAFFEINATION -- работает - "Вау! Весьма бодрит!"
+	self.Caffeination = G.CAFFEINATION
+	self.MinCaffeination = G.MIN_CAFFEINATION
+	
+	self.MaxHunger = G.MAX_HUNGER -- работает - "Бляяяха... У тя есть чо пожрать...?"
+	self.Hunger = G.HUNGER
+	self.MinHunger = G.MIN_HUNGER
+	
+	self.MaxImmunity = G.MAX_IMMUNITY -- работает пракитически идеально - "Бля... Что то мне... Нехорошо..."
+	self.Immunity = G.IMMUNITY
+	self.MinImmunity = G.MIN_IMMUNITY
+	
+	self.Temperature = 36.6 -- работает, но нужны доработки - "Блять... Я сейчас расплавлюсь..."
+	
+	-- Температура окружения, должна влиять на температуру но пока что не работает, нужны фиксы и дебаги
+	self.EnvironmentTemperature = 20 -- нейтральная
+	self.EnvironmentPercent = 0      -- -100..100 для дебага - "Фуууухххххх бляяяять... Какого хрена тут так холодно...? Бляяяять... Нужно найти чем согреться"
+	
+	self.Sepsis = G.SEPTIC_SHOCK
+	self.MinSepsis = G.MIN_SEPTIC_SHOCK -- работает - "Блять блять БЛЯТЬ! Сука! Как это остановить??? Бляяяяять я не хочу умирать..."
+	self.MaxSepsis = G.MAX_SEPTIC_SHOCK
+	
+	self.MinInfection = G.MIN_INFECTION
+	self.MaxInfection = G.MAX_INFECTION -- работает, вроде даже норм, вероятно будут внесены изменения или фиксы - "Блять... Что это за хуйня? Ну и мерзость... Болит..."
+	self.Infection = G.INFECTION
+	
+	self.MaxThirst = G.MAX_THIRST -- работает идеально - "Бля у тебя есть что нибудь выпить?"
+	self.Thirst = G.THIRST
+	self.MinThirst = G.MIN_THIRST
+	
+	self.MaxWetness = G.MAX_WETNESS -- не используется, пока что - "Блять пиздец, я весь вспотел нахуй!"
+	self.Wetness = G.WETNESS
+	self.MinWetness = G.MIN_WETNESS
+	
+	self.MaxEnergy = G.MAX_ENERGY -- работает "Хочу... Спать... Можно я просто усну и никогда не проснусь...?"
+	self.Energy = G.ENERGY
+	self.MinEnergy = G.MIN_ENERGY
+
+	self.MaxStamina = G.MAX_STAMINA -- пока что не используется, нет факторов расходующих стамину, нужно будет прописать что то вроде бега - "Блять... Сил... Никаких... Нет... с-сука..."
+	self.Stamina = G.STAMINA
+	self.MinStamina = G.MIN_STAMINA
+	
+	self.MinStimulated = G.MIN_STIMULATED -- нет стимуляторов, нужна хотя бы базовая логика - "ОООО ДААААА СУКА! ДА Я ТЕБЯ В ПОРОШОК РАЗЬЕБАШУ НАХУЙ"
+	self.Stimulated = G.STIMULATED
+	self.MaxStimulated = G.MAX_STIMULATED
+	
+	self.MinPainKillers = G.MIN_PAIN_KILLERS -- не прописано, нужно будет как нибудь решить эту проблему - "Ааааа... Еще дозу... Кто нибудь..."
+	self.PainKillers = G.PAIN_KILLERS
+	self.MaxPainKillers = G.MAX_PAIN_KILLERS
+	
+	self.MinHemothorax = G.MIN_HEMOTHORAX -- вроде как еще не прописано, нужно будет прописать - "БляААххАть... Сука... ЗадыхААюсь бЛяять!"
+	self.Hemothorax = G.HEMOTHORAX
+	self.MaxHemothorax = G.MAX_HEMOTHORAX
+	
+	self.InternalBleeding = G.INTERNAL_BLEEDING -- не прописано, нужно будет прописать это в BloodSystem - "БЛУуэээрэхх... Сука... Ох блять это же не...? Боже блять..."
+	self.MaxInternalBleeding = G.MAX_INTERNAL_BLEEDING
+	self.MinInternalBleeding = G.MIN_INTERNAL_BLEEDING
+
+	-- ОБЩЕЕ СОСТОЯНИЯ
+	self.States = {
+		Unconscious = false,
+		Dead = false,
+		Sleep = false,
+		Concussed = false,
+	}
+
+	-- ==============================
+	-- ЧАСТИ ТЕЛА
+	-- ==============================
+
+	local function CreateBaseLimb(displayName)
+		return {
+			DisplayName = displayName,
+			Skin = G.SKIN,
+			Muscle = G.MUSCLE,
+			RegenTimer = 0,
+			LimbBleed = G.LIMB_BLEED,
+			LimbPain = G.LIMB_PAIN,
+			Infection = G.INFECTION,
+			Fracture = false,
+			Dislocation = false,
+		}
+	end
+
+	local function CreateHead()
+		local head = CreateBaseLimb("Голова")
+		head.Skin = G.SKIN
+		head.Muscle = G.MUSCLE
+		head.Fracture = false
+		head.Dislocation = false
+		head.LimbBleed = G.LIMB_BLEED
+		head.LimbPain = G.LIMB_PAIN
+		head.Infection = G.INFECTION
+		head.RegenTimer = 0
+
+		head.JawRipped = false
+		head.LeftEyeRipped = false
+		head.RightEyeRipped = false
+
+		head.SmthinIn = false
+
+		return head
+	end
+
+	self.Parts = {
+
+		Head = CreateHead(), -- Голова
+
+		Chest = CreateBaseLimb("Грудная Клетка"), -- Грудная клетка
+
+		Stomach = CreateBaseLimb("Живот"), -- Живот
+
+		LeftShoulder = CreateBaseLimb("Левое Плечо"), -- Левое плечо
+
+		LeftForearm = CreateBaseLimb("Левое Предплечье"), -- Левое предплечье
+
+		RightShoulder = CreateBaseLimb("Правое Плечо"), -- Правое плечо
+
+		RightForearm = CreateBaseLimb("Правое Предплечье"), -- Правое предплечье
+
+		LeftThigh = CreateBaseLimb("Левое Бедро"), -- Левое бедро
+
+		LeftShin = CreateBaseLimb("Левая Голень"), -- Левая голень
+
+		RightThigh = CreateBaseLimb("Правое Бедро"), -- Правое бедро
+
+		RightShin = CreateBaseLimb("Правая Голень"), -- Правая голень
+	}
+
+    print("BodyData.New finished")
+	return self
+		
+	end
+return BodyData
