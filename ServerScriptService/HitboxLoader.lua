@@ -1,0 +1,20 @@
+-- HitboxLoader
+-- ServerScriptService/HitboxLoader
+
+local Players = game:GetService("Players")
+
+local HitboxService = require(
+	game.ServerScriptService.BodySystem.HitboxService
+)
+
+Players.PlayerAdded:Connect(function(player)
+
+	player.CharacterAdded:Connect(function(character)
+
+		task.wait(0.5)
+
+		HitboxService.Attach(character)
+
+	end)
+
+end)
