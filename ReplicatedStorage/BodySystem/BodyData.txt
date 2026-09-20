@@ -39,12 +39,12 @@ function BodyData.new()
 	self.MinShock = G.MIN_SHOCK
 
 	self.Blood = G.BLOOD
-	self.NormalBlood = G.NORMAL_BLOOD -- работает в штатном режиме, возможно потребуются изменения или модификации - "Интерестно, сколько еще его придется резать что бы вытекло все? Хи-хи:)"
+	self.NormalBlood = G.NORMAL_BLOOD -- работает, возможно потребуются изменения или модификации - "Интерестно, сколько еще его придется резать что бы вытекло все? Хи-хи:)"
 	self.MaxBlood = G.MAX_BLOOD
 	self.MinBlood = G.MIN_BLOOD
 	
 	self.BloodViscosity = G.BLOOD_VISCOUSITY
-	self.MinBloodViscosity = G.MIN_BLOOD_VISCOUSITY
+	self.MinBloodViscosity = G.MIN_BLOOD_VISCOUSITY -- работает
 	self.MaxBloodViscosity = G.MAX_BLOOD_VISCOUSITY
 	
 	self.AllBleeds = G.ALL_BLEEDS
@@ -61,7 +61,8 @@ function BodyData.new()
 	self.Oxygen = G.OXYGEN
 	self.MinOxygen = G.MIN_OXYGEN
 	
-	self.OxygenBlocked = false -- удушье вроде как работает но вероятно сломано, нужна проверка - "Я... З-ды-АЮсь... Кто ни-удь...! Помоги... Те..."
+	self.OxygenBlocked = false -- удушье работает - "Я... З-ды-АЮсь... Кто ни-удь...! Помоги... Те..."
+	self.SepsisShock = false -- септический шок, устанавливается InfectionSystem при сепсисе >= 99
 	self.HasAntibiotics = false -- работает - "Да ладно те, я здоров как бык!:D"
 	self.Energized = false -- работает - "ОУууу ДААА! Сука да я полон СИЛ И ЭНЕРГИИ!"
 	self.NonePainK_Overdose = false -- не используется
@@ -87,7 +88,7 @@ function BodyData.new()
 	self.EnvironmentPercent = 0      -- -100..100 для дебага - "Фуууухххххх бляяяять... Какого хрена тут так холодно...? Бляяяять... Нужно найти чем согреться"
 	
 	self.Sepsis = G.SEPTIC_SHOCK
-	self.MinSepsis = G.MIN_SEPTIC_SHOCK -- работает? Бля он пока что не убивает, исправь это, придурок - "Блять блять БЛЯТЬ! Сука! Как это остановить??? Бляяяяять я не хочу умирать..."
+	self.MinSepsis = G.MIN_SEPTIC_SHOCK -- работает? блять да - "Блять блять БЛЯТЬ! Сука! Как это остановить??? Бляяяяять я не хочу умирать..."
 	self.MaxSepsis = G.MAX_SEPTIC_SHOCK
 	
 	self.MinInfection = G.MIN_INFECTION
@@ -106,7 +107,7 @@ function BodyData.new()
 	self.Energy = G.ENERGY
 	self.MinEnergy = G.MIN_ENERGY
 
-	self.MaxStamina = G.MAX_STAMINA -- пока что не используется, нет факторов расходующих стамину, нужно будет прописать что то вроде бега - "Блять... Сил... Никаких... Нет... с-сука..."
+	self.MaxStamina = G.MAX_STAMINA -- вродь пока что норм но надо будет доработать - "Блять... Сил... Никаких... Нет... с-сука..."
 	self.Stamina = G.STAMINA
 	self.MinStamina = G.MIN_STAMINA
 	
@@ -118,11 +119,11 @@ function BodyData.new()
 	self.PainKillers = G.PAIN_KILLERS
 	self.MaxPainKillers = G.MAX_PAIN_KILLERS
 	
-	self.MinHemothorax = G.MIN_HEMOTHORAX -- еще не прописано, нужно будет прописать где нибудь в OxygenSystem - "БляААххАть... Сука... ЗадыхААюсь бЛяять!"
+	self.MinHemothorax = G.MIN_HEMOTHORAX -- готово, работает - "БляААххАть... Сука... ЗадыхААюсь бЛяять!"
 	self.Hemothorax = G.HEMOTHORAX
 	self.MaxHemothorax = G.MAX_HEMOTHORAX
 	
-	self.InternalBleeding = G.INTERNAL_BLEEDING -- не прописано, нужно будет прописать это в BloodSystem - "БЛУуэээрэхх... Сука... Ох блять это же не...? Боже... Блять блять БЛЯТЬ!..."
+	self.InternalBleeding = G.INTERNAL_BLEEDING -- нормуль, вродь работает как надо - "БЛУуэээрэхх... Сука... Ох блять это же не...? Боже... Блять блять БЛЯТЬ!..."
 	self.MaxInternalBleeding = G.MAX_INTERNAL_BLEEDING
 	self.MinInternalBleeding = G.MIN_INTERNAL_BLEEDING
 
@@ -132,6 +133,10 @@ function BodyData.new()
 		Dead = false,
 		Sleep = false,
 		Concussed = false,
+		HasSleepingPill = false,
+		ForcedSleep = false,
+		TransitioningSleep = false,
+		TransitioningWake = false,
 	}
 
 	-- ==============================
