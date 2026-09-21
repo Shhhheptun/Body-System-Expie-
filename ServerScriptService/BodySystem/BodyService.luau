@@ -685,6 +685,12 @@ Players.PlayerAdded:Connect(function(player)
 	BodyService:CreateBodyForPlayer(player)
 end)
 
+-- Если BodyService был запущен после появления игроков,
+-- PlayerAdded для них уже не сработает. Создаём тела и для них.
+for _, player in ipairs(Players:GetPlayers()) do
+	BodyService:CreateBodyForPlayer(player)
+end
+
 Players.PlayerRemoving:Connect(function(player)
 	BodyService:RemoveBodyForPlayer(player)
 end)
@@ -722,17 +728,8 @@ end)
 -- ==============================
 
 -- ==========================================
--- НАДЁЖНЫЙ ХЕНДЛЕР СИСТЕМЫ СНА НА БАЗЕ ENERGY
+-- ХЕНДЛЕР СИСТЕМЫ СНА
 -- ==========================================
-local SleepSystemModule = Systems:FindFirstChild("SleepSystem")
-local SleepSystem = nil
-
-if SleepSystemModule then
-	SleepSystem = require(SleepSystemModule)
-	print("[BodyService] Ссылка на SleepSystem успешно настроена на Energy!")
-end
-
--- Находи этот кусок в своем BodyService и заменяй его целиком:
 
 SleepRemote.OnServerEvent:Connect(function(player, action)
 	local body = BodyService.Bodies[player]
