@@ -34,7 +34,6 @@ function OxygenSystem.Update(body, dt)
 	-- ===== ЛЁГКИЕ =====
 	local lungFactor = 1
 	local hemothorax = body.Hemothorax or 0
-	local maxHemothorax = body.MaxHemothorax or 100
 
 	-- Гемоторакс снижает максимальный кислород на 0.66 за пункт выше 10
 	local hemothoraxOxygenPenalty = 0
@@ -49,13 +48,6 @@ function OxygenSystem.Update(body, dt)
 	if isOxygenBlocked then
 		lungFactor = 0
 	end
-	
-	-- ===== BRAIN DAMAGE =====
-	if body.Oxygen < 5 then
-		body.Brain -= 1.5 * dt
-	end
-	
-	body.Brain = math.max(body.Brain, 0)
 
 	lungFactor = clamp(lungFactor, 0, 1)
 
@@ -72,26 +64,31 @@ function OxygenSystem.Update(body, dt)
 	local targetOxygen = effectiveMaxOxygen * bloodLimit * lungFactor
 
 	-- ===== СКОРОСТЬ (ЛИНЕЙНАЯ) =====
-	local regenRate = 5 -- единиц в секунду
-	local drainRate = 1 -- скорость падения при обычном удушье
+	local regenRate = 5
+	local drainRate = 1
 
-	-- При септическом шоке падение быстрее
 	if isOxygenBlocked then
-		drainRate = 1 -- смерть приближается
+		drainRate = 1
 	end
 
 	if targetOxygen > body.Oxygen then
-		-- Восстановление
 		body.Oxygen = math.min(body.Oxygen + regenRate * dt, targetOxygen)
 	elseif isOxygenBlocked then
-		-- Падение при удушье (линейное)
 		body.Oxygen = math.max(body.Oxygen - drainRate * dt, targetOxygen)
 	elseif targetOxygen < body.Oxygen then
-		-- Мгновенное падение до targetOxygen (кровопотеря и т.д.)
 		body.Oxygen = targetOxygen
 	end
 
 	body.Oxygen = clamp(body.Oxygen, body.MinOxygen, body.MaxOxygen)
+
+	-- ===== BRAIN DAMAGE =====
+	-- Проверяем уже обновлённый Oxygen, чтобы гипоксия начинала
+	-- влиять на мозг в тот же тик, когда кислород опустился ниже 5.
+	if body.Oxygen < 5 then
+		body.Brain -= 1.5 * dt
+	end
+
+	body.Brain = math.max(body.Brain, 0)
 
 end
 
