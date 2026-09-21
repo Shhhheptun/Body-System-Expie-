@@ -474,53 +474,69 @@ end
 
 local logTimer = 0 -- для логирования раз в секунду
 
-function BodyService:UpdateVitals(body, dt)
-	
+-- ==============================
+-- UPDATE PHASES
+-- ==============================
+-- Важно: фазы разделены архитектурно, но текущий порядок расчётов сохраняется.
+--
+-- PRE:
+--   базовый расход Energy
+--
+-- SYSTEMS:
+--   Blood -> Infection -> Pain -> Adrenaline -> Shock
+--   -> Oxygen -> Consciousness -> Sleep
+--
+-- POST:
+--   Stamina -> Caffeination -> Hunger -> Thirst -> Environment Temperature
+--
+-- FINAL:
+--   Brain clamp -> Immunity -> Limb regen -> Global states
+--   -> Moodles -> Client sync
+
+function BodyService:PreUpdate(body, dt)
+
 	-- =====================
 	-- ENERGY
 	-- =====================
 
-	local baseDrain = 0.07 -- базовое падение в секунду
+	local baseDrain = 0.07
 	local multiplier = 1
 
-	-- усталость
 	if body.Stamina and body.Stamina < 5 then
 		multiplier *= 3.5
 	end
 
-	-- бодрость
 	if body.Caffeination and body.Caffeination > 0 then
 		multiplier *= 0.55
 	end
 
-	if body.States.Sleep then
-		-- реген энергии во сне — делегировано SleepSystem
-		-- SleepSystem.Update обрабатывает реген, здесь не трогаем
-	else
+	if not body.States.Sleep then
 		body.Energy = math.clamp(
 			body.Energy - (baseDrain * multiplier) * dt,
 			0,
 			100
 		)
 	end
-	
-	-- =====================
-	-- ENERGY → CONSCIOUSNESS 
-	-- =====================
-	
-	for _, system in ipairs(LoadedSystems) do
+end
 
+function BodyService:RunSystemPipeline(body, dt)
+
+	for index, system in ipairs(LoadedSystems) do
 		if system.Update then
 			system.Update(body, dt)
+		elseif DEBUG then
+			warn("[BodyService] System has no Update():", index)
 		end
 	end
-	
+end
+
+function BodyService:PostUpdate(body, dt)
+
 	-- =====================
-	-- STAMINA DRAIN (БЕГ)
+	-- STAMINA DRAIN
 	-- =====================
 
 	if body._IsRunning then
-		-- Расход стамины при беге: 10 единиц в минуту
 		local staminaDrain = Config.Global.STAMINA_DRAIN_RUNNING * dt
 		body.Stamina = math.clamp(
 			body.Stamina - staminaDrain,
@@ -528,7 +544,7 @@ function BodyService:UpdateVitals(body, dt)
 			body.MaxStamina
 		)
 	end
-	
+
 	-- =====================
 	-- STAMINA REGEN
 	-- =====================
@@ -536,7 +552,6 @@ function BodyService:UpdateVitals(body, dt)
 	local staminaRegenPerSecond = Config.Global.STAMINA_REGEN_RATE
 	local energyMultiplier = 1
 
-	-- Градация регена стамины от уровня энергии (от меньшего к большему!)
 	if body.Energy < 5 then
 		energyMultiplier = 0.1
 	elseif body.Energy < 15 then
@@ -547,15 +562,12 @@ function BodyService:UpdateVitals(body, dt)
 		energyMultiplier = 0
 	end
 
-	-- НЕ восстанавливаем если бежим
 	local canRegen = not body._IsRunning
-	
-	-- НЕ восстанавливаем 1 секунду после прыжка
+
 	if body._LastJumpTime and tick() - body._LastJumpTime < Config.Global.STAMINA_REGEN_JUMP_COOLDOWN then
 		canRegen = false
 	end
 
-	-- СЕПСИС ПЕНАЛЬТИ К СТАМИНЕ
 	local sepsisStaminaPenalty = body.SepsisStaminaPenalty or 0
 	local effectiveMaxStamina = body.MaxStamina * (1 - sepsisStaminaPenalty / 100)
 
@@ -566,30 +578,25 @@ function BodyService:UpdateVitals(body, dt)
 			effectiveMaxStamina
 		)
 	end
-	
+
 	-- =====================
 	-- CAFFEINATION
 	-- =====================
 
 	local caffeineDrainPerSecond = 1 / 12
 
-	-- уменьшаем уровень
 	body.Caffeination = math.clamp(
 		body.Caffeination - caffeineDrainPerSecond * dt,
 		Config.Global.MIN_CAFFEINATION,
 		Config.Global.MAX_CAFFEINATION
 	)
 
-	-- обновляем состояние Energized
-	if body.Caffeination > 0 then
-		body.Energized = true
-	else
-		body.Energized = false
-	end
+	body.Energized = body.Caffeination > 0
 
 	-- =====================
 	-- HUNGER
 	-- =====================
+
 	local hungerDrain = 2.6 / 60
 	body.Hunger = math.clamp(
 		body.Hunger - hungerDrain * dt,
@@ -600,16 +607,11 @@ function BodyService:UpdateVitals(body, dt)
 	-- =====================
 	-- THIRST
 	-- =====================
+
 	local normalTemp = 36.6
 	local baseDenominator = 17
-
 	local tempDelta = body.Temperature - normalTemp
-
-	local denominator = baseDenominator - (tempDelta * 2)
-
-	-- ограничиваем чтобы не сломалось
-	denominator = math.clamp(denominator, 8, 40)
-
+	local denominator = math.clamp(baseDenominator - (tempDelta * 2), 8, 40)
 	local thirstDrainPerSecond = 1 / denominator
 
 	body.Thirst = math.clamp(
@@ -617,18 +619,26 @@ function BodyService:UpdateVitals(body, dt)
 		0,
 		100
 	)
-	
+
 	-- =====================
-	-- ENVIRONMENT TEMPERATURE UPDATE
+	-- ENVIRONMENT TEMPERATURE
 	-- =====================
 
 	local envPercent = EnvTempToPercent(body.EnvironmentTemperature)
-	body.EnvironmentPercent = envPercent -- для дебага
+	body.EnvironmentPercent = envPercent
 
 	local targetTemp = PercentToTargetBodyTemp(envPercent)
 
-	body.Temperature = body.Temperature + 
+	body.Temperature = body.Temperature +
 		(targetTemp - body.Temperature) * BODY_TEMP_ADAPT_RATE * dt
+end
+
+-- Совместимость со старым API.
+-- Новый код должен использовать отдельные фазы выше.
+function BodyService:UpdateVitals(body, dt)
+	self:PreUpdate(body, dt)
+	self:RunSystemPipeline(body, dt)
+	self:PostUpdate(body, dt)
 end
 
 function BodyService:UpdateBody(body, dt)
@@ -637,9 +647,26 @@ function BodyService:UpdateBody(body, dt)
 		warn("BODY NOT TABLE", body)
 		return
 	end
-	
-	self:UpdateVitals(body, dt)
-	
+
+	-- ==============================
+	-- PRE UPDATE
+	-- ==============================
+	self:PreUpdate(body, dt)
+
+	-- ==============================
+	-- SYSTEM PIPELINE
+	-- ==============================
+	self:RunSystemPipeline(body, dt)
+
+	-- ==============================
+	-- POST UPDATE
+	-- ==============================
+	self:PostUpdate(body, dt)
+
+	-- ==============================
+	-- FINAL STATE PROCESSING
+	-- ==============================
+
 	-- FIX: Brain не уходит в минус
 	body.Brain = math.max(body.Brain or 0, 0)
 	
