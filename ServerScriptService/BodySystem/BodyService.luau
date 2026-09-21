@@ -31,29 +31,83 @@ local BodyData = require(StorageBodySystem:WaitForChild("BodyData"))
 -- SYSTEMS
 local Systems = ServerBodySystem.Systems
 
--- AUTO LOAD SYSTEMS
+-- ==============================
+-- SYSTEM PIPELINE
+-- ==============================
+-- Порядок здесь ЯВНЫЙ. Не полагаемся на порядок GetChildren().
+--
+-- Blood       -> обновляет объём крови и внутренние кровотечения
+-- Infection   -> обновляет инфекции, сепсис и связанные эффекты
+-- Pain        -> собирает BasePain из конечностей
+-- Adrenaline  -> модифицирует Pain через BasePain
+-- Shock       -> использует BasePain
+-- Oxygen      -> использует Blood + Infection/Sepsis + Hemothorax
+-- Consciousness -> использует Oxygen и Brain
+-- Sleep       -> последним управляет сном, энергией и сознанием
+--
+local SYSTEM_UPDATE_ORDER = {
+	"BloodSystem",
+	"InfectionSystem",
+	"PainSystem",
+	"AdrenalineSystem",
+	"ShockSystem",
+	"OxygenSystem",
+	"ConsciousnessSystem",
+	"SleepSystem",
+}
 
 local LoadedSystems = {}
+local LoadedSystemNames = {}
 local SleepSystem = nil -- отдельная ссылка для прямого доступа
 
+local SystemModules = {}
 for _, module in ipairs(Systems:GetChildren()) do
-
 	if module:IsA("ModuleScript") then
+		SystemModules[module.Name] = module
+	end
+end
 
+-- Сначала загружаем системы в определённом порядке.
+for _, systemName in ipairs(SYSTEM_UPDATE_ORDER) do
+	local module = SystemModules[systemName]
+
+	if module then
 		local system = require(module)
 		table.insert(LoadedSystems, system)
+		LoadedSystemNames[systemName] = true
 
-		-- Сохраняем ссылку на SleepSystem
-		if module.Name == "SleepSystem" then
+		if systemName == "SleepSystem" then
 			SleepSystem = system
 		end
 
 		if DEBUG then
-			print("[BodyService] Loaded system:", module.Name)
+			print("[BodyService] Loaded system:", systemName)
 		end
-
 	end
+end
 
+-- Новые системы, ещё не добавленные в pipeline, не теряем.
+-- Они запускаются после известных систем в стабильном алфавитном порядке.
+local UnorderedModules = {}
+for moduleName, module in pairs(SystemModules) do
+	if not LoadedSystemNames[moduleName] then
+		table.insert(UnorderedModules, module)
+	end
+end
+
+table.sort(UnorderedModules, function(a, b)
+	return a.Name < b.Name
+end)
+
+for _, module in ipairs(UnorderedModules) do
+	local system = require(module)
+	table.insert(LoadedSystems, system)
+	LoadedSystemNames[module.Name] = true
+
+	if DEBUG then
+		warn("[BodyService] System is not in explicit pipeline:", module.Name)
+		print("[BodyService] Loaded fallback system:", module.Name)
+	end
 end
 
 local function SyncToClient(body, player)
